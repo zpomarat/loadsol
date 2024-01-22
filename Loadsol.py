@@ -142,7 +142,7 @@ class Loadsol:
         return self.right_gyro
 
     def remove_duplicate_data(self):
-        """Identify duplicate data and replace them by NaN values.
+        """Identify duplicate data in raw data and replace them by NaN values.
 
         Returns:
             time (np.ndarray): time with unique and interpolated data.
@@ -191,10 +191,10 @@ class Loadsol:
         )
 
     def suppress_outliers(self):
-        """Suppresses the outliers in force data (outlier = negative value of force).
+        """Suppresses the outliers in force data without duplicate (outlier = negative value of force).
 
         Returns:
-            left_force, right_force (np.ndarray): force data with outliers suppressed.
+            time, left_force, right_force, left_accelero, right_accelero, left_gyro, right_gyro (np.ndarray): data with outliers suppressed.
         """
         # Get data without duplicate
         (
@@ -236,6 +236,11 @@ class Loadsol:
         )
 
     def interpolate(self):
+        """Interpolates missing data from data without duplicate and outliers.
+
+        Returns:
+            tile, left_force, right_force, left_accelero, right_accelero, left_gyro, right_gyro (np.ndarray): data interpolated.
+        """
         # Get raw data without duplicate and outliers
         (
             time,
