@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 
 
 class DataForceplates(Data.Data):
-    def __init__(self, path: str):
-        super().__init__(path)
+    def __init__(self, path: str, frequency):
+        super().__init__(path, frequency)   
+        self.raw_data = None
 
     # def get_name(self):
     #     name_split = self.path.split("\\")
@@ -57,21 +58,21 @@ class DataForceplates(Data.Data):
             data_analog.append(analog)
 
         # Create an array containing only the raw analog data
-        raw_data = []
+        self.raw_data = []
         
         for i in range(len(data_analog)):
             if i==0:
-                raw_data = data_analog[i][2].T
+                self.raw_data = data_analog[i][2].T
             else:  
-                raw_data = np.concatenate((raw_data,data_analog[i][2].T),axis=0)
+                self.raw_data = np.concatenate((self.raw_data,data_analog[i][2].T),axis=0)
 
-        return raw_data
+        return self.raw_data
 
-    def set_time(self,forceplates_frequency):
+    def set_time(self):
         """ Creates the attribute "time of the DataForcplates class."""
-
-        raw_data = self.c3d_reader_forceplates()
-        self.time = np.arange(0,len(raw_data)/forceplates_frequency,1/forceplates_frequency)         # TODO f en init
+        if self.raw_data is None:
+            self.c3d_reader_forceplates()
+        self.time = np.arange(0,len(self.raw_data)/self.frequency,1/self.frequency)
 
 
     def set_data(self,forceplate_number:int):
@@ -82,18 +83,19 @@ class DataForceplates(Data.Data):
 
         self.data: np.ndarray [3D] (Fx, Fy, Fz)
         """
-        raw_data = self.c3d_reader_forceplates()
+        if self.raw_data is None:
+            self.c3d_reader_forceplates()
         match forceplate_number:
             case 1:
-                self.data = raw_data[:,0:3]
+                self.data = self.raw_data[:,0:3]
             case 2:
-                self.data = raw_data[:,6:10]
+                self.data = self.raw_data[:,6:10]
             case 3:
-                self.data = raw_data[:,12:15]
+                self.data = self.raw_data[:,12:15]
             case 4:
-                self.data = raw_data[:,18:21]
+                self.data = self.raw_data[:,18:21]
             case 5:
-                self.data = raw_data[:,24:27]
+                self.data = self.raw_data[:,24:27]
             
     def change_orientation(self):
         """Inverses the orientation of the forceplates."""
