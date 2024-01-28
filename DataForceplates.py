@@ -115,7 +115,9 @@ class DataForceplates(Data.Data):
 if __name__ == "__main__":
     curr_path = getcwd()
 
-    test = DataForceplates(curr_path + "\\examples\\data\\test_poussee_4_fp.c3d")
+    # test = DataForceplates(curr_path + "\\examples\\data\\test_poussee_4_fp.c3d")
+    test = DataForceplates(curr_path + "/examples/data/test_poussee_4_fp.c3d", frequency=1000)
+
     print("Time:")
     print(test.time)
 
@@ -132,7 +134,7 @@ if __name__ == "__main__":
     print("Raw data dimension:")
     print(raw_data.shape)
 
-    test.set_time(1000)
+    test.set_time()
     print("Time:")
     print(test.time)
     
