@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 class DataForceplates(Data.Data):
     def __init__(self, path: str, frequency):
-        super().__init__(path, frequency)   
+        super().__init__(path, frequency)
         self.raw_data = None
 
     # def get_name(self):
@@ -58,24 +58,46 @@ class DataForceplates(Data.Data):
             data_analog.append(analog)
 
         # Create an array containing only the raw analog data
-        self.raw_data = []
+        raw_data = []
         
         for i in range(len(data_analog)):
             if i==0:
-                self.raw_data = data_analog[i][2].T
+                raw_data = data_analog[i][2].T
             else:  
-                self.raw_data = np.concatenate((self.raw_data,data_analog[i][2].T),axis=0)
+                raw_data = np.concatenate((raw_data,data_analog[i][2].T),axis=0)
 
-        return self.raw_data
+        self.raw_data = raw_data
 
-    def set_time(self):
+    def extract_time(self):
         """ Creates the attribute "time of the DataForcplates class."""
+
         if self.raw_data is None:
             self.c3d_reader_forceplates()
-        self.time = np.arange(0,len(self.raw_data)/self.frequency,1/self.frequency)
 
+        # Set forceplate frequency
+        FP_FREQUENCY = 1000
 
-    def set_data(self,forceplate_number:int):
+        self.time = np.arange(0,len(self.raw_data)/FP_FREQUENCY,1/FP_FREQUENCY)
+
+    def get_time(self):
+        try:
+            return self.time
+        except:
+            self.extact_time()
+            return self.time
+
+    def extract_data(self):
+        if self.raw_data is None:
+            self.c3d_reader_forceplates()
+
+        self.raw_data_f1 = self.raw_data[:,0:3]
+        self.raw_data_f2 = self.raw_data[:,6:10]
+        self.raw_data_f3 = self.raw_data[:,12:15]
+        self.raw_data_f4 = self.raw_data[:,18:21]
+        self.raw_data_f5 = self.raw_data[:,24:27]
+            
+
+    def get_raw_data(self,forceplate_number:int):
         """Creates the attribute "data" to the DataForceplates class.
 
         Args:
@@ -84,18 +106,20 @@ class DataForceplates(Data.Data):
         self.data: np.ndarray [3D] (Fx, Fy, Fz)
         """
         if self.raw_data is None:
-            self.c3d_reader_forceplates()
+            self.extract_data()
+            
         match forceplate_number:
             case 1:
-                self.data = self.raw_data[:,0:3]
+                data = self.raw_data[:,0:3]
             case 2:
-                self.data = self.raw_data[:,6:10]
+                data = self.raw_data[:,6:10]
             case 3:
-                self.data = self.raw_data[:,12:15]
+                data = self.raw_data[:,12:15]
             case 4:
-                self.data = self.raw_data[:,18:21]
+                data = self.raw_data[:,18:21]
             case 5:
-                self.data = self.raw_data[:,24:27]
+                data = self.raw_data[:,24:27]
+        return data
             
     def change_orientation(self):
         """Inverses the orientation of the forceplates."""
@@ -112,12 +136,11 @@ class DataForceplates(Data.Data):
 
 
 
+
 if __name__ == "__main__":
     curr_path = getcwd()
 
-    # test = DataForceplates(curr_path + "\\examples\\data\\test_poussee_4_fp.c3d")
-    test = DataForceplates(curr_path + "/examples/data/test_poussee_4_fp.c3d", frequency=1000)
-
+    test = DataForceplates(curr_path + "\\examples\\data\\test_poussee_4_fp.c3d", frequency=1000)
     print("Time:")
     print(test.time)
 
@@ -128,26 +151,43 @@ if __name__ == "__main__":
     print("Timestamp:")
     print(test.timestamp)
 
-    raw_data = test.c3d_reader_forceplates()
+    test.c3d_reader_forceplates()
     print("Raw analog data:")
-    print(raw_data)
+    print(test.raw_data)
     print("Raw data dimension:")
-    print(raw_data.shape)
+    print(test.raw_data.shape)
 
-    test.set_time()
+    test.extract_time()
     print("Time:")
     print(test.time)
+
+    test.extract_data()
     
-    test.set_data(1)
-    print("Data:")
-    print(test.data)
-    print("Data dimension")
-    print(test.data.shape)
-    plt.plot(test.time,test.data)
+    # test.set_data(1)
+    # print("Data:")
+    # print(test.data)
+    # print("Data dimension")
+    # print(test.data.shape)
+    # plt.plot(test.time,test.data)
+    # plt.show()
+
+    # test.change_orientation()
+    # plt.plot(test.time,test.data)
+    # plt.show()
+
+    
+    resampled_data = test.downsample(200,forceplate_number=1)
+    resampled_time = test.downsample(200, time=test.time)
+    
+    filtered_data_x = test.filter_data(2,20,10,data = resampled_data, column = 0)
+    filtered_data_y = test.filter_data(2,20,10,data = resampled_data, column = 1)
+    filtered_data_z = test.filter_data(2,20,10,data = resampled_data, column = 2)
+    
+    plt.plot(test.time,test.raw_data[:,0:3],"-o" ,label = "raw", markersize = 2)
+    plt.plot(resampled_time, resampled_data, "-o", label = "resampled", markersize = 2)
+    plt.plot(resampled_time, filtered_data_x, "-o", label = "filtered", markersize = 2)
+    plt.plot(resampled_time, filtered_data_y, "-o", label = "filtered", markersize = 2)
+    plt.plot(resampled_time, filtered_data_z, "-o", label = "filtered", markersize = 2)
+
+    plt.legend()
     plt.show()
-
-    test.change_orientation()
-    plt.plot(test.time,test.data)
-    plt.show()
-
-
