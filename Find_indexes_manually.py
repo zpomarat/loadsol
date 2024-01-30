@@ -14,6 +14,7 @@ from DataLoadsol import DataLoadsol
 from DataForceplates import DataForceplates
 import kineticstoolkit as ktk
 
+import matplotlib.pyplot as plt
 ktk.import_extensions()
 ktk.change_defaults()
 
@@ -104,3 +105,6 @@ pointe_1_raw_l_acc = pointe_1_ls.get_raw_data(insole_side="LEFT", data_type="ACC
 pointe_3_raw_l_acc = pointe_3_ls.get_raw_data(insole_side="LEFT", data_type="ACC")
 pointe_5_raw_l_acc = pointe_5_ls.get_raw_data(insole_side="LEFT", data_type="ACC")
 
+for val in [poids_raw_l_acc,pointe_1_raw_l_acc,pointe_3_raw_l_acc, pointe_5_raw_l_acc]:
+    plt.plot(val)
+plt.show()

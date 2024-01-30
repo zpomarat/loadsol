@@ -15,6 +15,8 @@ class DataLoadsol(Data):
         self.pre_processed_data_l_f_heel = None
         self.pre_processed_time = None 
         self.filled_data_l_f_heel = None
+
+        self.path_csv = self.path[:-3] + "csv"
         
 
     def convert_txt_to_csv(self, output_path: str): ## TODO: fix problem: there is a "t" before each value in the csv file
@@ -23,7 +25,7 @@ class DataLoadsol(Data):
         Args:
             output_path (str): path of the converted file.
         """
-
+# TODO : output_directory instead of output_path could be more clear ? 
         # Delimiter used in the input file
         input_delimiter = "\t"
 
@@ -40,6 +42,7 @@ class DataLoadsol(Data):
 
         # Open the output file in write mode
         output_file = self.file_name + ".csv"
+        # TODO output_filename might be clearer
         with open(
             output_path + output_file, "w", newline="", encoding="utf-8"
         ) as outfile:
@@ -49,7 +52,7 @@ class DataLoadsol(Data):
             # Write the data to the CSV file
             writer.writerows(data)
 
-        self.path = output_path + output_file
+
 
 
     def csv_reader_loadsol(self):
@@ -60,7 +63,7 @@ class DataLoadsol(Data):
         """
 
         ## Read csv file line by line after going to the directory containing the file to handle
-        lines = open(self.path, "r").readlines()
+        lines = open(self.path_csv, "r").readlines()
 
         # Start reading the file at line k to skip the header
         k = 4
@@ -76,15 +79,12 @@ class DataLoadsol(Data):
         for i in range(rows):
             if ",-," in lines[k + i]:
                 lines[k + i] = lines[k + i].replace("-,", "nan,")
-
             data_line = np.fromstring(lines[k + i][:-3], sep=",")
-
             # Number of columns of the data file
-            columns = len(data_line[0])
-
+            columns = len(data_line)
             # Print error message if the number of columns is not equal to 24
             if columns != 24:
-                print("Data missing, the file '" + self.file_name + "' is not processed.")
+                raise ValueError("Data missing, the file '" + self.file_name + "' is not processed.")
                 break
             raw_data[i, :] = data_line
         self.raw_data = raw_data
