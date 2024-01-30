@@ -17,7 +17,7 @@ class DataLoadsol(Data):
         self.filled_data_l_f_heel = None
         
 
-    def convert_txt_to_csv(self, output_path: str):
+    def convert_txt_to_csv(self, output_path: str): ## TODO: fix problem: there is a "t" before each value in the csv file
         """Converts a txt file to a csv file and change the attribute "path" to the DataLoadsol class by the path of csv file.
 
         Args:
@@ -80,11 +80,11 @@ class DataLoadsol(Data):
             data_line = np.fromstring(lines[k + i][:-3], sep=",")
 
             # Number of columns of the data file
-            columns = len(data_line)
+            columns = len(data_line[0])
 
             # Print error message if the number of columns is not equal to 24
             if columns != 24:
-                print("Data missing, the file is not processed.")
+                print("Data missing, the file '" + self.file_name + "' is not processed.")
                 break
             raw_data[i, :] = data_line
         self.raw_data = raw_data
