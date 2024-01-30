@@ -9,10 +9,13 @@ import pandas as pd
 class DataLoadsol(Data):
     def __init__(self,path:str, frequency):
         super().__init__(path, frequency)
+        # Define some attributs as None only to see whether specific methods have already been called or not.
         self.raw_data = None
+        self.raw_data_l_f_heel = None
         self.pre_processed_data_l_f_heel = None
         self.pre_processed_time = None 
-        self.raw_data_l_f_heel = None # Defined here as None only to see whether the method extract_data has already been called or not.
+        self.filled_data_l_f_heel = None
+        
 
     def convert_txt_to_csv(self, output_path: str):
         """Converts a txt file to a csv file and change the attribute "path" to the DataLoadsol class by the path of csv file.
@@ -48,8 +51,9 @@ class DataLoadsol(Data):
 
         self.path = output_path + output_file
 
+
     def csv_reader_loadsol(self):
-        """Reads csv file containing raw insoles data and write them in a ndarray.
+        """Reads csv file containing raw insoles data and writes them in a ndarray.
 
         Returns:
             raw_data (np.ndarray): raw data of both insoles of a pair.
@@ -85,8 +89,10 @@ class DataLoadsol(Data):
             raw_data[i, :] = data_line
         self.raw_data = raw_data
 
+
     def extract_timestamp(self):
         """Creates the attribute "timestamp" to the DataLoadsol class."""
+        
         ## Read csv file line by line after going to the directory containing the file to handle
         lines = open(self.path, "r").readlines()
 
@@ -104,62 +110,74 @@ class DataLoadsol(Data):
 
         self.timestamp = timestamp
 
+
     def extact_time(self):
         """Creates the attribute "time" to the DataLoadsol class.
 
             Time in s.
 
             self.time: np.ndarray [1D]"""
+        
         if self.raw_data is None:
             self.csv_reader_loadsol()
         
         self.raw_time = self.raw_data[:, 0]
 
-    def extact_time_left(self):
-        """Creates the attribute "time" to the DataLoadsol class.
+
+    def extract_time_left(self):
+        """Creates the attribute "time_left" to the DataLoadsol class.
 
             Time in s.
 
             self.time: np.ndarray [1D]"""
+        
         if self.raw_data is None:
             self.csv_reader_loadsol()
         
         self.raw_time_left = self.raw_data[:, 0]
 
-    def extact_time_right(self):
-        """Creates the attribute "time" to the DataLoadsol class.
+    def extract_time_right(self):
+        """Creates the attribute "time_right" to the DataLoadsol class.
 
             Time in s.
 
             self.time: np.ndarray [1D]"""
+        
         if self.raw_data is None:
             self.csv_reader_loadsol()
         
         self.raw_time_right = self.raw_data[:, 12]
     
     def get_raw_time(self):
+        """Returns the raw time vector.
+        """
         try:
             return self.raw_time
         except:
             self.extact_time()
             return self.raw_time
     
+
     def get_raw_time_left(self):
+        """Returns the raw left time vector."""
         try:
             return self.raw_time_left
         except:
-            self.extact_time_left()
+            self.extract_time_left()
             return self.raw_time_left
         
+
     def get_raw_time_right(self):
+        """Returns the raw right time vector."""
         try:
             return self.raw_time_right
         except:
-            self.extact_time_right()
+            self.extract_time_right()
             return self.raw_time_right
 
+
     def extract_raw_data(self):
-        """Fills the arrays of the raw data.
+        """Creates specific attributes "data" to the DataLoadSol class.
         """
         if self.raw_data is None:
             self.csv_reader_loadsol()
@@ -180,19 +198,20 @@ class DataLoadsol(Data):
 
         
     def get_raw_data(self,insole_side:str,data_type:str):
-        """Creates the attribute "data" to the DataLoadSol class and returns it.
+        """Returns specific attributes "raw_data" of the DataLoadSol class.
 
         Args:
             insole_side (str): "LEFT" or "RIGHT"
             data_type (str): "F_HEEL" or "F_MEDIAL" or "F_LATERAL" or "F_TOTAL" or "ACC" or "GYRO"
 
-        data: np.ndarray [1D] if "F_HEEL" or "F_MEDIAL" or "F_LATERAL" or "F_TOTAL"
-        data: np.ndarray [3D] if "ACC" or "GYRO"
+        raw_data: np.ndarray [1D] if "F_HEEL" or "F_MEDIAL" or "F_LATERAL" or "F_TOTAL"
+        raw_data: np.ndarray [3D] if "ACC" or "GYRO"
         """
         
         if self.raw_data_l_f_heel is None:
             self.extract_raw_data()
 
+        # Get raw data
         match insole_side, data_type:
             case "LEFT", "F_HEEL":
                 raw_data = self.raw_data[:,1]
@@ -218,13 +237,17 @@ class DataLoadsol(Data):
                 raw_data = self.raw_data[:,18:21]
             case "RIGHT", "GYRO":
                 raw_data = self.raw_data[:,21:24]
-        return raw_data 
+        return raw_data     
+
 
     def suppress_incorrect_values(self):
-
+        """Replaces the incorrect values in force data by NaN (incorrect value = negative value of force per zone).
+            Creates new specific attributes "pre_processed_data" to the DataLoadsol class.
+        """
         if self.pre_processed_data_l_f_heel is None:
             self.pre_processed_time = self.get_raw_time()
 
+        # Initialise pre processed data
             self.pre_processed_data_l_f_heel = self.get_raw_data('LEFT','F_HEEL')
             self.pre_processed_data_l_f_medial = self.get_raw_data('LEFT','F_MEDIAL')
             self.pre_processed_data_l_f_lateral = self.get_raw_data('LEFT','F_LATERAL')
@@ -245,7 +268,6 @@ class DataLoadsol(Data):
         index_incorrect_values_left = [index for index, item in enumerate(self.raw_data_l_f_heel) if item < 0]
         index_incorrect_values_right = [index for index, item in enumerate(self.raw_data_r_f_heel) if item < 0]
 
-
         # Replace incorrect values by NaN
         for i in index_incorrect_values_left:
             self.pre_processed_data_l_f_heel[i] = np.NaN
@@ -259,8 +281,12 @@ class DataLoadsol(Data):
             self.pre_processed_data_r_f_lateral[i] = np.NaN
             self.pre_processed_data_r_f_total[i] = np.NaN
 
-    def supress_duplicate_data(self):
 
+    def suppress_duplicate_data(self):
+        """Finds and suppresses duplicate data.
+            Redefines specififc attributes "pre_processed_data".
+            Redefine the attribut "time".
+        """
         if self.pre_processed_data_l_f_heel is None:
             self.suppress_incorrect_values()
 
@@ -276,7 +302,7 @@ class DataLoadsol(Data):
         # Frequency
         FREQUENCY = 1 / (self.raw_time[1] - self.raw_time[0])
 
-        # Replace by nan values the line before the line corresponding to the index identified
+        # Replace by nan values the line before the line corresponding to the index identified for the left side
         for i in index_duplicate_left:
             self.pre_processed_time_left[i-1] = np.NaN
             self.pre_processed_data_l_f_heel[i-1] = np.NaN
@@ -289,6 +315,7 @@ class DataLoadsol(Data):
             # Complete time nan values
             self.pre_processed_time_left[i - 1] = (i - 1) / FREQUENCY
 
+        # Replace by nan values the line before the line corresponding to the index identified for the right side
         for i in index_duplicate_right:
             self.pre_processed_time_right[i-1] = np.NaN
             self.pre_processed_data_r_f_heel[i-1] = np.NaN
@@ -301,31 +328,189 @@ class DataLoadsol(Data):
             # Complete time nan values
             self.pre_processed_time_right[i - 1] = (i - 1) / FREQUENCY
 
+        # Redefine time attribut
         self.pre_processed_time = self.pre_processed_time_left
 
 
+    def get_pre_processed_data(self,insole_side, data_type):
+        """Returns specific attributes "pre_processed_data" of the DataLoadSol class.
+
+        Args:
+            insole_side (str): "LEFT" or "RIGHT"
+            data_type (str): "F_HEEL" or "F_MEDIAL" or "F_LATERAL" or "F_TOTAL" or "ACC" or "GYRO"
+
+        pre_processed_data: np.ndarray [1D] if "F_HEEL" or "F_MEDIAL" or "F_LATERAL" or "F_TOTAL"
+        pre_processed_data: np.ndarray [3D] if "ACC" or "GYRO"
+        """
+
+        if self.pre_processed_data_l_f_heel is None:
+            self.suppress_duplicate_data()
+
+        # Get pre-processed data
+        match insole_side, data_type:
+            case "LEFT", "F_HEEL":
+                pre_processed_data = self.pre_processed_data_l_f_heel
+            case "LEFT", "F_MEDIAL":
+                pre_processed_data = self.pre_processed_data_l_f_lateral
+            case "LEFT", "F_LATERAL":
+                pre_processed_data = self.pre_processed_data_l_f_medial
+            case "LEFT", "F_TOTAL":
+                pre_processed_data = self.pre_processed_data_l_f_total
+            case "LEFT", "ACC":
+                pre_processed_data = self.pre_processed_data_l_acc
+            case "LEFT", "GYRO":
+                pre_processed_data = self.pre_processed_data_l_gyro
+            case "RIGHT", "F_HEEL":
+                pre_processed_data = self.pre_processed_data_r_f_heel
+            case "RIGHT", "F_MEDIAL":
+                pre_processed_data = self.pre_processed_data_r_f_lateral
+            case "RIGHT", "F_LATERAL":
+                pre_processed_data = self.pre_processed_data_r_f_medial
+            case "RIGHT", "F_TOTAL":
+                pre_processed_data = self.pre_processed_data_r_f_total
+            case "RIGHT", "ACC":
+                pre_processed_data = self.pre_processed_data_r_acc
+            case "RIGHT", "GYRO":
+                pre_processed_data = self.pre_processed_data_r_gyro
+        return pre_processed_data 
+    
+
+    def get_pre_processed_time(self):
+        """Returns the pre-processed time vector.
+        """
+        try:
+            return self.pre_processed_time
+        except:
+            self.suppress_duplicate_data()
+            return self.pre_processed_time
+
+
+
     def fill_missing_data(self):
+        """Interpolates missing data."""
 
         if self.pre_processed_time is None:
-            self.supress_duplicate_data()
-            
-        
+            self.suppress_duplicate_data()
 
-        # Convert to dataframe
-        data = pd.DataFrame(data=self.pre_processed_data_l_f_heel)
-        data_interpolated = data.interpolate('cubic')
-        
-        # Convert to ndarray
-        data_inter= data_interpolated.to_numpy()
-        data_interpolated = np.reshape(data_inter,(len(data_inter),))
-        
+        # Initialise filled data
+        self.filled_data_l_f_heel = self.get_pre_processed_data('LEFT','F_HEEL')
+        self.filled_data_l_f_medial = self.get_pre_processed_data('LEFT','F_MEDIAL')
+        self.filled_data_l_f_lateral = self.get_pre_processed_data('LEFT','F_LATERAL')
+        self.filled_data_l_f_total = self.get_pre_processed_data('LEFT','F_TOTAL')
+        self.filled_data_l_acc = self.get_pre_processed_data('LEFT','ACC')
+        self.filled_data_l_gyro = self.get_pre_processed_data('LEFT','GYRO')
 
-        return data_interpolated
+        self.filled_data_r_f_heel = self.get_pre_processed_data('RIGHT','F_HEEL')
+        self.filled_data_r_f_medial = self.get_pre_processed_data('RIGHT','F_MEDIAL')
+        self.filled_data_r_f_lateral = self.get_pre_processed_data('RIGHT','F_LATERAL')
+        self.filled_data_r_f_total = self.get_pre_processed_data('RIGHT','F_TOTAL')
+        self.filled_data_r_acc = self.get_pre_processed_data('RIGHT','ACC')
+        self.filled_data_r_gyro = self.get_pre_processed_data('RIGHT','GYRO')
         
+        # self.filled_time = self.get_pre_processed_time()
 
+        # Convert the data to fill into dataframe
+        data_l_f_heel = pd.DataFrame(self.filled_data_l_f_heel)
+        data_l_f_medial = pd.DataFrame(self.filled_data_l_f_medial)
+        data_l_f_lateral = pd.DataFrame(self.filled_data_l_f_lateral)
+        data_l_f_total = pd.DataFrame(self.filled_data_l_f_total)
+        data_l_acc = pd.DataFrame(self.filled_data_l_acc)
+        data_l_gyro = pd.DataFrame(self.filled_data_l_gyro)
 
-       
-           
+        data_r_f_heel = pd.DataFrame(self.filled_data_r_f_heel)
+        data_r_f_medial = pd.DataFrame(self.filled_data_r_f_medial)
+        data_r_f_lateral = pd.DataFrame(self.filled_data_r_f_lateral)
+        data_r_f_total = pd.DataFrame(self.filled_data_r_f_total)
+        data_r_acc = pd.DataFrame(self.filled_data_r_acc)
+        data_r_gyro = pd.DataFrame(self.filled_data_r_gyro)
+
+        # Interpolate with the cubic method
+        data_l_f_heel_filled = data_l_f_heel.interpolate('cubic')
+        data_l_f_medial_filled = data_l_f_medial.interpolate('cubic')
+        data_l_f_lateral_filled = data_l_f_lateral.interpolate('cubic')
+        data_l_f_total_filled = data_l_f_total.interpolate('cubic')
+        data_l_acc_filled = data_l_acc.interpolate('cubic')
+        data_l_gyro_filled = data_l_gyro.interpolate('cubic')
+
+        data_r_f_heel_filled = data_r_f_heel.interpolate('cubic')
+        data_r_f_medial_filled = data_r_f_medial.interpolate('cubic')
+        data_r_f_lateral_filled = data_r_f_lateral.interpolate('cubic')
+        data_r_f_total_filled = data_r_f_total.interpolate('cubic')
+        data_r_acc_filled = data_r_acc.interpolate('cubic')
+        data_r_gyro_filled = data_r_gyro.interpolate('cubic')
+        
+        # Convert the data interpolated into ndarray
+        data_l_f_heel_filled = np.reshape(data_l_f_heel_filled.to_numpy(),(len(data_l_f_heel_filled),))
+        data_l_f_medial_filled = np.reshape(data_l_f_medial_filled.to_numpy(),(len(data_l_f_medial_filled),))
+        data_l_f_lateral_filled = np.reshape(data_l_f_lateral_filled.to_numpy(),(len(data_l_f_lateral_filled),))
+        data_l_f_total_filled = np.reshape(data_l_f_total_filled.to_numpy(),(len(data_l_f_total_filled),))
+        data_l_acc_filled = data_l_acc_filled.to_numpy()
+        data_l_gyro_filled = data_l_gyro_filled.to_numpy()
+
+        data_r_f_heel_filled = np.reshape(data_r_f_heel_filled.to_numpy(),(len(data_r_f_heel_filled),))
+        data_r_f_medial_filled = np.reshape(data_r_f_medial_filled.to_numpy(),(len(data_r_f_medial_filled),))
+        data_r_f_lateral_filled = np.reshape(data_r_f_lateral_filled.to_numpy(),(len(data_r_f_lateral_filled),))
+        data_r_f_total_filled = np.reshape(data_r_f_total_filled.to_numpy(),(len(data_r_f_total_filled),))
+        data_r_acc_filled = data_r_acc_filled.to_numpy()
+        data_r_gyro_filled = data_r_gyro_filled.to_numpy()
+        
+        # Fill attributes
+        self.filled_data_l_f_heel = data_l_f_heel_filled
+        self.filled_data_l_f_medial = data_l_f_medial_filled
+        self.filled_data_l_f_lateral = data_l_f_lateral_filled
+        self.filled_data_l_f_total = data_l_f_total_filled
+        self.filled_data_l_acc = data_l_acc_filled
+        self.filled_data_l_gyro = data_l_gyro_filled
+
+        self.filled_data_r_f_heel = data_r_f_heel_filled
+        self.filled_data_r_f_medial = data_r_f_medial_filled
+        self.filled_data_r_f_lateral = data_r_f_lateral_filled
+        self.filled_data_r_f_total = data_r_f_total_filled
+        self.filled_data_r_acc = data_r_acc_filled
+        self.filled_data_r_gyro = data_r_gyro_filled
+ 
+    
+    def get_filled_data(self, insole_side, data_type):
+        """Returns specific attributes "filled_data" of the DataLoadSol class.
+
+        Args:
+            insole_side (str): "LEFT" or "RIGHT"
+            data_type (str): "F_HEEL" or "F_MEDIAL" or "F_LATERAL" or "F_TOTAL" or "ACC" or "GYRO"
+
+        filled_data: np.ndarray [1D] if "F_HEEL" or "F_MEDIAL" or "F_LATERAL" or "F_TOTAL"
+        filled_data: np.ndarray [3D] if "ACC" or "GYRO"
+        """
+        if self.filled_data_l_f_heel is None:
+            self.fill_missing_data()
+
+        # Get pre-processed data
+        match insole_side, data_type:
+            case "LEFT", "F_HEEL":
+                filled_data = self.filled_data_l_f_heel
+            case "LEFT", "F_MEDIAL":
+                filled_data = self.filled_data_l_f_lateral
+            case "LEFT", "F_LATERAL":
+                filled_data = self.filled_data_l_f_medial
+            case "LEFT", "F_TOTAL":
+                filled_data = self.filled_data_l_f_total
+            case "LEFT", "ACC":
+                filled_data = self.filled_data_l_acc
+            case "LEFT", "GYRO":
+                filled_data = self.filled_data_l_gyro
+            case "RIGHT", "F_HEEL":
+                filled_data = self.filled_data_r_f_heel
+            case "RIGHT", "F_MEDIAL":
+                filled_data = self.filled_data_r_f_lateral
+            case "RIGHT", "F_LATERAL":
+                filled_data = self.filled_data_r_f_medial
+            case "RIGHT", "F_TOTAL":
+                filled_data = self.filled_data_r_f_total
+            case "RIGHT", "ACC":
+                filled_data = self.filled_data_r_acc
+            case "RIGHT", "GYRO":
+                filled_data = self.filled_data_r_gyro
+        return filled_data
+        
 
 
 
@@ -351,18 +536,6 @@ if __name__ == "__main__":
 
     raw_data_l_f_tot = test.get_raw_data("LEFT","F_TOTAL")
     print(f"Data (total force of the left insole): {raw_data_l_f_tot}")
-    
-    # resampled_data_l_f_tot = test.downsample(100,insole_side="LEFT",data_type="F_TOTAL")
-    # resampled_time = test.downsample(100, time=test.time)
-    
-    # filter_data_l_f_tot = test.filter_data(2,20,10,data=resampled_data_l_f_tot,column=0,dimension_1=True)
-    
-    # plt.plot(test.raw_time,raw_data_l_f_tot,"-o" ,label = "raw", markersize = 2)
-    # plt.plot(resampled_time, resampled_data_l_f_tot, "-o", label = "resampled", markersize = 2)
-    # plt.plot(resampled_time, filter_data_l_f_tot, "-o", label = "filtered", markersize = 2)
-
-    # plt.legend()
-    # plt.show()
 
     plt.plot(test.raw_time, raw_data_l_f_tot,label="raw")
     test.suppress_incorrect_values()
@@ -370,19 +543,33 @@ if __name__ == "__main__":
     plt.legend()
     plt.show()
 
-    test.extact_time_left()
-    test.extact_time_right()
+    test.extract_time_left()
+    test.extract_time_right()
     plt.plot(test.raw_time_left,"-o",label="raw time left",markersize = 2)
     plt.plot(test.raw_time_right,"-o",label="raw time right",markersize = 2)
-    test.supress_duplicate_data()
+    test.suppress_duplicate_data()
     plt.plot(test.raw_time_left,"-o",label="processed time left",markersize = 2)
     plt.plot(test.raw_time_right,"-o",label="processed time left",markersize = 2)
     plt.legend()
     plt.show()
 
-    data_interpolated = test.fill_missing_data()
+    filled_data_l_f_heel = test.get_filled_data('LEFT','F_HEEL')
 
-    plt.plot(test.pre_processed_time,data_interpolated,label='interpolated')
+    plt.plot(test.pre_processed_time,filled_data_l_f_heel,label='interpolated')
     plt.plot(test.raw_time,test.pre_processed_data_l_f_heel,label='pre_processed')
+    plt.legend()
+    plt.show()
+
+    resampled_data_l_f_heel = test.downsample(100,insole_side="LEFT",data_type="F_HEEL")
+    resampled_time = test.downsample(100, time=test.pre_processed_time)
+
+    filter_data_l_f_heel = test.filter_data(2,20,10,data=resampled_data_l_f_heel,column=0,dimension_1=True)
+
+    
+    plt.plot(test.pre_processed_time, filled_data_l_f_heel,"-o" ,label = "filled", markersize = 2)
+    plt.plot(resampled_time, resampled_data_l_f_heel, "-o", label = "resampled", markersize = 2)
+    plt.plot(test.raw_time,test.raw_data_l_f_heel,"-o" ,label = "raw", markersize = 2)
+    plt.plot(resampled_time, filter_data_l_f_heel, "-o", label = "filtered", markersize = 2)
+
     plt.legend()
     plt.show()
