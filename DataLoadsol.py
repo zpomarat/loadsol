@@ -4,14 +4,14 @@ import numpy as np
 from os import getcwd
 from datetime import datetime
 import matplotlib.pyplot as plt
-from scipy import interpolate
+import pandas as pd
 
 class DataLoadsol(Data):
     def __init__(self,path:str, frequency):
         super().__init__(path, frequency)
         self.raw_data = None
         self.pre_processed_data_l_f_heel = None
-        self.pre_processed_time = None
+        self.pre_processed_time = None 
         self.raw_data_l_f_heel = None # Defined here as None only to see whether the method extract_data has already been called or not.
 
     def convert_txt_to_csv(self, output_path: str):
@@ -20,7 +20,6 @@ class DataLoadsol(Data):
         Args:
             output_path (str): path of the converted file.
         """
-        
 
         # Delimiter used in the input file
         input_delimiter = "\t"
@@ -309,26 +308,19 @@ class DataLoadsol(Data):
 
         if self.pre_processed_time is None:
             self.supress_duplicate_data()
-
-        time = list(self.get_raw_time())
-        indexes_missing_values = [indx for indx, item in enumerate(self.pre_processed_data_l_f_heel.tolist()) if np.isnan(item)]
-        ntime=[]
-        ndata = []
-        for i in range(len(time)):
-            if not(i in indexes_missing_values):
-                ntime.append(time[i])
-                ndata.append(time[i])
+            
         
-        ntime = np.array(ntime)
-        ndata = np.array(ndata)
 
-        f = interpolate.CubicSpline(ntime,ndata)
+        # Convert to dataframe
+        data = pd.DataFrame(data=self.pre_processed_data_l_f_heel)
+        data_interpolated = data.interpolate('cubic')
+        
+        # Convert to ndarray
+        data_inter= data_interpolated.to_numpy()
+        data_interpolated = np.reshape(data_inter,(len(data_inter),))
+        
 
-        time_interpolated = f(self.pre_processed_time)
-        data_interpolated = f(self.pre_processed_data_l_f_heel)
-
-        return data_interpolated,time_interpolated
-
+        return data_interpolated
         
 
 
@@ -388,8 +380,9 @@ if __name__ == "__main__":
     plt.legend()
     plt.show()
 
-    data_interpolated,time_interpolated = test.fill_missing_data()
+    data_interpolated = test.fill_missing_data()
+
+    plt.plot(test.pre_processed_time,data_interpolated,label='interpolated')
     plt.plot(test.raw_time,test.pre_processed_data_l_f_heel,label='pre_processed')
-    plt.plot(time_interpolated,data_interpolated,label='interpolated')
     plt.legend()
     plt.show()
