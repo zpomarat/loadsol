@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 class DataLoadsol(Data):
-    def __init__(self,path:str, frequency):
+    def __init__(self,path:str, frequency:int):
         super().__init__(path, frequency)
         # Define some attributs as None only to see whether specific methods have already been called or not.
         self.raw_data = None

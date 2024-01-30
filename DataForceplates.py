@@ -7,14 +7,13 @@ import matplotlib.pyplot as plt
 
 
 class DataForceplates(Data.Data):
-    def __init__(self, path: str, frequency):
+    def __init__(self, path: str, frequency:int):
         super().__init__(path, frequency)
+        # Define some attributs as None only to see whether specific methods have already been called or not.
         self.raw_data = None
+        self.raw_data_f1 = None
+        self.pre_processed_data_f1 = None
 
-    # def get_name(self):
-    #     name_split = self.path.split("\\")
-    #     self.name = name_split[-1][:-4]
-    #     return self.name
 
     def set_timestamp(self):
         """Creates the attribute "timestamp" of the DataForceplates class."""
@@ -42,6 +41,7 @@ class DataForceplates(Data.Data):
 
         self.timestamp = timestamp
 
+
     def c3d_reader_forceplates(self):
         """Reads a c3d file and extracts the raw analog data.
 
@@ -68,8 +68,9 @@ class DataForceplates(Data.Data):
 
         self.raw_data = raw_data
 
+
     def extract_time(self):
-        """ Creates the attribute "time of the DataForcplates class."""
+        """ Creates the attribute "time" of the DataForcplates class."""
 
         if self.raw_data is None:
             self.c3d_reader_forceplates()
@@ -79,14 +80,21 @@ class DataForceplates(Data.Data):
 
         self.time = np.arange(0,len(self.raw_data)/FP_FREQUENCY,1/FP_FREQUENCY)
 
+
     def get_time(self):
+        """Returns the raw time vector.
+        """
         try:
             return self.time
         except:
-            self.extact_time()
+            self.extract_time()
             return self.time
 
+
     def extract_data(self):
+        """Creates specific attributes "data" to the DataForceplates class.
+        """
+
         if self.raw_data is None:
             self.c3d_reader_forceplates()
 
@@ -105,27 +113,74 @@ class DataForceplates(Data.Data):
 
         self.data: np.ndarray [3D] (Fx, Fy, Fz)
         """
-        if self.raw_data is None:
+        if self.raw_data_f1 is None:
             self.extract_data()
             
         match forceplate_number:
             case 1:
-                data = self.raw_data[:,0:3]
+                raw_data = self.raw_data[:,0:3]
             case 2:
-                data = self.raw_data[:,6:10]
+                raw_data = self.raw_data[:,6:10]
             case 3:
-                data = self.raw_data[:,12:15]
+                raw_data = self.raw_data[:,12:15]
             case 4:
-                data = self.raw_data[:,18:21]
+                raw_data = self.raw_data[:,18:21]
             case 5:
-                data = self.raw_data[:,24:27]
-        return data
+                raw_data = self.raw_data[:,24:27]
+        return raw_data
             
     def change_orientation(self):
         """Inverses the orientation of the forceplates."""
-        self.data = -self.data
+
+        # Initialise pre processed data
+        self.pre_processed_data_f1 = self.get_raw_data(1)
+        self.pre_processed_data_f2 = self.get_raw_data(2)
+        self.pre_processed_data_f3 = self.get_raw_data(3)
+        self.pre_processed_data_f4 = self.get_raw_data(4)
+        self.pre_processed_data_f5 = self.get_raw_data(5)
+
+        # Change orientation
+        self.pre_processed_data_f1 = -self.pre_processed_data_f1
+        self.pre_processed_data_f2 = -self.pre_processed_data_f2
+        self.pre_processed_data_f3 = -self.pre_processed_data_f3
+        self.pre_processed_data_f4 = -self.pre_processed_data_f4
+        self.pre_processed_data_f5 = -self.pre_processed_data_f5
+
+        # Redefine time attribut
+        self.pre_processed_time = self.time     ## TODO: move to set_zero
 
     # def set_zero(self):
+        
+    def get_pre_processed_data(self,forceplate_number:int):
+        """Returns specific attributes "pre_processed_data" of the DataForceplates class."""
+
+        if self.pre_processed_data_f1 is None:
+            self.change_orientation()   ## TODO: change to set_zero
+
+        # Get pre-processed data
+        match forceplate_number:
+            case 1:
+                pre_processed_data = self.pre_processed_data_f1
+            case 2:
+                pre_processed_data = self.pre_processed_data_f2
+            case 3:
+                pre_processed_data = self.pre_processed_data_f3
+            case 4:
+                pre_processed_data = self.pre_processed_data_f4
+            case 5:
+                pre_processed_data = self.pre_processed_data_f5
+        return pre_processed_data
+    
+    def get_pre_processed_time(self):
+        """Returns the pre-processed time vector.
+        """
+        try:
+            return self.pre_processed_time
+        except:
+            self.change_orientation()       ## TODO: change to set_zero
+            return self.pre_processed_time
+
+
 
 
 
@@ -141,53 +196,45 @@ if __name__ == "__main__":
     curr_path = getcwd()
 
     test = DataForceplates(curr_path + "\\examples\\data\\test_poussee_4_fp.c3d", frequency=1000)
-    print("Time:")
-    print(test.time)
+    print(f"Time: {test.time}")
 
-    print("File name:")
-    print(test.file_name)
+    print(f"File name: {test.file_name}")
 
     test.set_timestamp()
-    print("Timestamp:")
-    print(test.timestamp)
+    print(f"Timestamp: {test.timestamp}")
 
     test.c3d_reader_forceplates()
-    print("Raw analog data:")
-    print(test.raw_data)
-    print("Raw data dimension:")
-    print(test.raw_data.shape)
+    print(f"Raw analog data: {test.raw_data}")
+    print(f"Raw data dimension: {test.raw_data.shape}")
 
     test.extract_time()
-    print("Time:")
-    print(test.time)
+    print(f"Time: {test.time}")
 
     test.extract_data()
     
-    # test.set_data(1)
-    # print("Data:")
-    # print(test.data)
-    # print("Data dimension")
-    # print(test.data.shape)
-    # plt.plot(test.time,test.data)
-    # plt.show()
+    fp1 = test.get_raw_data(1)
+    print(f"Data forceplate 1: {fp1}")
+    print(f"Data dimension: {fp1.shape}")
+    plt.plot(test.time,fp1)
+    plt.show()
 
-    # test.change_orientation()
-    # plt.plot(test.time,test.data)
-    # plt.show()
+    test.change_orientation()
+    plt.plot(test.time,test.pre_processed_data_f1)
+    plt.show()
 
     
-    resampled_data = test.downsample(200,forceplate_number=1)
+    resampled_data_fp1 = test.downsample(200,forceplate_number=1)
     resampled_time = test.downsample(200, time=test.time)
     
-    filtered_data_x = test.filter_data(2,20,10,data = resampled_data, column = 0)
-    filtered_data_y = test.filter_data(2,20,10,data = resampled_data, column = 1)
-    filtered_data_z = test.filter_data(2,20,10,data = resampled_data, column = 2)
+    filtered_data_x_1 = test.filter_data(2,20,10,data = resampled_data_fp1, column = 0)
+    filtered_data_y_1 = test.filter_data(2,20,10,data = resampled_data_fp1, column = 1)
+    filtered_data_z_1 = test.filter_data(2,20,10,data = resampled_data_fp1, column = 2)
     
     plt.plot(test.time,test.raw_data[:,0:3],"-o" ,label = "raw", markersize = 2)
-    plt.plot(resampled_time, resampled_data, "-o", label = "resampled", markersize = 2)
-    plt.plot(resampled_time, filtered_data_x, "-o", label = "filtered", markersize = 2)
-    plt.plot(resampled_time, filtered_data_y, "-o", label = "filtered", markersize = 2)
-    plt.plot(resampled_time, filtered_data_z, "-o", label = "filtered", markersize = 2)
+    plt.plot(resampled_time, resampled_data_fp1, "-o", label = "resampled", markersize = 2)
+    plt.plot(resampled_time, filtered_data_x_1, "-o", label = "filtered", markersize = 2)
+    plt.plot(resampled_time, filtered_data_y_1, "-o", label = "filtered", markersize = 2)
+    plt.plot(resampled_time, filtered_data_z_1, "-o", label = "filtered", markersize = 2)
 
     plt.legend()
     plt.show()
