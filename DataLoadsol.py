@@ -111,17 +111,17 @@ class DataLoadsol(Data):
         self.timestamp = timestamp
 
 
-    def extact_time(self):
-        """Creates the attribute "time" to the DataLoadsol class.
+    # def extract_time(self):
+    #     """Creates the attribute "time" to the DataLoadsol class.
 
-            Time in s.
+    #         Time in s.
 
-            self.time: np.ndarray [1D]"""
+    #         self.time: np.ndarray [1D]"""
         
-        if self.raw_data is None:
-            self.csv_reader_loadsol()
+    #     if self.raw_data is None:
+    #         self.csv_reader_loadsol()
         
-        self.raw_time = self.raw_data[:, 0]
+    #     self.raw_time = self.raw_data[:, 0]
 
 
     def extract_time_left(self):
@@ -148,14 +148,14 @@ class DataLoadsol(Data):
         
         self.raw_time_right = self.raw_data[:, 12]
     
-    def get_raw_time(self):
-        """Returns the raw time vector.
-        """
-        try:
-            return self.raw_time
-        except:
-            self.extact_time()
-            return self.raw_time
+    # def get_raw_time(self):
+    #     """Returns the raw time vector.
+    #     """
+    #     try:
+    #         return self.raw_time
+    #     except:
+    #         self.extract_time()
+    #         return self.raw_time
     
 
     def get_raw_time_left(self):
@@ -244,8 +244,8 @@ class DataLoadsol(Data):
         """Replaces the incorrect values in force data by NaN (incorrect value = negative value of force per zone).
             Creates new specific attributes "pre_processed_data" to the DataLoadsol class.
         """
-        if self.pre_processed_data_l_f_heel is None:
-            self.pre_processed_time = self.get_raw_time()
+        if self.raw_data_l_f_heel is None:
+            self.extract_raw_data()
 
         # Initialise pre processed data
             self.pre_processed_data_l_f_heel = self.get_raw_data('LEFT','F_HEEL')
@@ -290,6 +290,13 @@ class DataLoadsol(Data):
         if self.pre_processed_data_l_f_heel is None:
             self.suppress_incorrect_values()
 
+        # if self.raw_time is None:
+        #     self.extract_time()
+            
+        # Initialise pre processed time
+        self.pre_processed_time_left = self.get_raw_time_left()
+        self.pre_processed_time_right = self.get_raw_time_right()
+
         # Indexes of duplicate values
         index_duplicate_left = [
             index for index, item in enumerate(self.raw_time_left) if item in self.raw_time_left[:index]
@@ -300,7 +307,8 @@ class DataLoadsol(Data):
         ]
 
         # Frequency
-        FREQUENCY = 1 / (self.raw_time[1] - self.raw_time[0])
+        # FREQUENCY = 1 / (self.raw_time_left[1] - self.raw_time_left[0])
+        FREQUENCY = self.frequency
 
         # Replace by nan values the line before the line corresponding to the index identified for the left side
         for i in index_duplicate_left:
@@ -378,11 +386,10 @@ class DataLoadsol(Data):
     def get_pre_processed_time(self):
         """Returns the pre-processed time vector.
         """
-        try:
-            return self.pre_processed_time
-        except:
+        if self.pre_processed_time == None:
             self.suppress_duplicate_data()
-            return self.pre_processed_time
+            
+        return self.pre_processed_time
 
 
 
