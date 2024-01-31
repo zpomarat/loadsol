@@ -34,7 +34,7 @@ class Data:
         if forceplate_number is not None:    
             data = self.get_pre_processed_data(forceplate_number) # Raw data from forceplate
         if time is not None:
-            data = self.get_pre_processed_time() 
+            data = self.get_filled_time() 
 
         # Initialise a list
         downsampled_data = []

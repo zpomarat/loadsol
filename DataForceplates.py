@@ -146,6 +146,8 @@ class DataForceplates(Data.Data):
         self.pre_processed_data_f4 = -self.pre_processed_data_f4
         self.pre_processed_data_f5 = -self.pre_processed_data_f5
 
+        # Redefine time attribut
+        self.pre_processed_time = self.time
 
     def set_zero(self):
         if self.pre_processed_data_f1 is None:
@@ -193,8 +195,8 @@ class DataForceplates(Data.Data):
         self.pre_processed_data_f5[:,1] -= mean_fy5
         self.pre_processed_data_f5[:,2] -= mean_fz5
 
-        # Redefine time attribut
-        self.pre_processed_time = self.time
+        # # Redefine time attribut
+        # self.pre_processed_time = self.time
         
         
     def get_pre_processed_data(self,forceplate_number:int):
@@ -223,8 +225,18 @@ class DataForceplates(Data.Data):
         try:
             return self.pre_processed_time
         except:
-            self.pre_processed_time = self.set_zero()
+            self.set_zero()
             return self.pre_processed_time
+        
+
+    def get_filled_time(self):
+        """Returns the pre-processed time vector.
+        """
+        try:
+            return self.filled_time
+        except:
+            self.filled_time = self.pre_processed_time
+            return self.filled_time
 
 
 
@@ -241,7 +253,7 @@ class DataForceplates(Data.Data):
 if __name__ == "__main__":
     curr_path = getcwd()
 
-    test = DataForceplates(curr_path + "\\examples\\data\\test_poussee_1.c3d", frequency=1000)
+    test = DataForceplates(curr_path + "\\examples\\data\\test_pointe_1.c3d", frequency=1000)
     print(f"Time: {test.time}")
 
     print(f"File name: {test.file_name}")
@@ -262,26 +274,30 @@ if __name__ == "__main__":
     print(f"Data forceplate 1: {fp1}")
     print(f"Data dimension: {fp1.shape}")
     plt.plot(test.time,fp1)
-    plt.show()
+    plt.figure()
 
     test.change_orientation()
     plt.plot(test.time,test.pre_processed_data_f1)
-    plt.show()
+    plt.figure()
 
     plt.plot(test.time,test.pre_processed_data_f1,label="before zero setting")
     test.set_zero()
-    plt.plot(test.time,test.pre_processed_data_f1,label="after zero setting")
-    plt.legend()
-    plt.show()
+    plt.plot(test.pre_processed_time,test.pre_processed_data_f1,label="after zero setting")
+    plt.figure()
 
+    filled_time = test.get_filled_time()
     resampled_data_fp1 = test.downsample(200,forceplate_number=1)
-    resampled_time = test.downsample(200, time=test.time)
+    resampled_time = test.downsample(200, time=filled_time)
+    filled_time = test.get_filled_time()
     
     filtered_data_x_1 = test.filter_data(2,20,10,data = resampled_data_fp1, column = 0)
     filtered_data_y_1 = test.filter_data(2,20,10,data = resampled_data_fp1, column = 1)
     filtered_data_z_1 = test.filter_data(2,20,10,data = resampled_data_fp1, column = 2)
     
     plt.plot(test.time,test.raw_data[:,0:3],"-o" ,label = "raw", markersize = 2)
+    plt.plot(resampled_time, resampled_data_fp1, "-o", label = "resampled", markersize = 2)
+    plt.figure()
+
     plt.plot(resampled_time, resampled_data_fp1, "-o", label = "resampled", markersize = 2)
     plt.plot(resampled_time, filtered_data_x_1, "-o", label = "filtered", markersize = 2)
     plt.plot(resampled_time, filtered_data_y_1, "-o", label = "filtered", markersize = 2)
