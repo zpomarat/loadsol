@@ -15,17 +15,16 @@ class DataLoadsol(Data):
         self.pre_processed_data_l_f_heel = None
         self.pre_processed_time = None 
         self.filled_data_l_f_heel = None
-
         self.path_csv = self.path[:-3] + "csv"
         
 
-    def convert_txt_to_csv(self, output_path: str): ## TODO: fix problem: there is a "t" before each value in the csv file
+    def convert_txt_to_csv(self, output_directory: str):
         """Converts a txt file to a csv file and change the attribute "path" to the DataLoadsol class by the path of csv file.
 
         Args:
-            output_path (str): path of the converted file.
+            output_directory (str): path of the directory contaning the converted file.
         """
-# TODO : output_directory instead of output_path could be more clear ? 
+
         # Delimiter used in the input file
         input_delimiter = "\t"
 
@@ -41,18 +40,15 @@ class DataLoadsol(Data):
             data = list(reader)
 
         # Open the output file in write mode
-        output_file = self.file_name + ".csv"
-        # TODO output_filename might be clearer
+        output_filename = self.file_name + ".csv"
         with open(
-            output_path + output_file, "w", newline="", encoding="utf-8"
+            output_directory + output_filename, "w", newline="", encoding="utf-8"
         ) as outfile:
             # Create a CSV writer object for the output file
             writer = csv.writer(outfile, delimiter=output_delimiter)
 
             # Write the data to the CSV file
             writer.writerows(data)
-
-
 
 
     def csv_reader_loadsol(self):
@@ -111,19 +107,6 @@ class DataLoadsol(Data):
         self.timestamp = timestamp
 
 
-    # def extract_time(self):
-    #     """Creates the attribute "time" to the DataLoadsol class.
-
-    #         Time in s.
-
-    #         self.time: np.ndarray [1D]"""
-        
-    #     if self.raw_data is None:
-    #         self.csv_reader_loadsol()
-        
-    #     self.raw_time = self.raw_data[:, 0]
-
-
     def extract_time_left(self):
         """Creates the attribute "time_left" to the DataLoadsol class.
 
@@ -135,6 +118,7 @@ class DataLoadsol(Data):
             self.csv_reader_loadsol()
         
         self.raw_time_left = self.raw_data[:, 0]
+
 
     def extract_time_right(self):
         """Creates the attribute "time_right" to the DataLoadsol class.
@@ -148,18 +132,10 @@ class DataLoadsol(Data):
         
         self.raw_time_right = self.raw_data[:, 12]
     
-    # def get_raw_time(self):
-    #     """Returns the raw time vector.
-    #     """
-    #     try:
-    #         return self.raw_time
-    #     except:
-    #         self.extract_time()
-    #         return self.raw_time
-    
 
     def get_raw_time_left(self):
         """Returns the raw left time vector."""
+
         try:
             return self.raw_time_left
         except:
@@ -169,6 +145,7 @@ class DataLoadsol(Data):
 
     def get_raw_time_right(self):
         """Returns the raw right time vector."""
+
         try:
             return self.raw_time_right
         except:
@@ -179,6 +156,7 @@ class DataLoadsol(Data):
     def extract_raw_data(self):
         """Creates specific attributes "data" to the DataLoadSol class.
         """
+
         if self.raw_data is None:
             self.csv_reader_loadsol()
 
@@ -244,6 +222,7 @@ class DataLoadsol(Data):
         """Replaces the incorrect values in force data by NaN (incorrect value = negative value of force per zone).
             Creates new specific attributes "pre_processed_data" to the DataLoadsol class.
         """
+
         if self.raw_data_l_f_heel is None:
             self.extract_raw_data()
 
@@ -287,12 +266,10 @@ class DataLoadsol(Data):
             Redefines specififc attributes "pre_processed_data".
             Redefine the attribut "time".
         """
+
         if self.pre_processed_data_l_f_heel is None:
             self.suppress_incorrect_values()
 
-        # if self.raw_time is None:
-        #     self.extract_time()
-            
         # Initialise pre processed time
         self.pre_processed_time_left = self.get_raw_time_left()
         self.pre_processed_time_right = self.get_raw_time_right()
@@ -386,11 +363,11 @@ class DataLoadsol(Data):
     def get_pre_processed_time(self):
         """Returns the pre-processed time vector.
         """
-        if self.pre_processed_time == None:
+
+        if self.pre_processed_time is None:
             self.suppress_duplicate_data()
             
         return self.pre_processed_time
-
 
 
     def fill_missing_data(self):
@@ -413,8 +390,6 @@ class DataLoadsol(Data):
         self.filled_data_r_f_total = self.get_pre_processed_data('RIGHT','F_TOTAL')
         self.filled_data_r_acc = self.get_pre_processed_data('RIGHT','ACC')
         self.filled_data_r_gyro = self.get_pre_processed_data('RIGHT','GYRO')
-        
-        # self.filled_time = self.get_pre_processed_time()
 
         # Convert the data to fill into dataframe
         data_l_f_heel = pd.DataFrame(self.filled_data_l_f_heel)
@@ -487,6 +462,7 @@ class DataLoadsol(Data):
         filled_data: np.ndarray [1D] if "F_HEEL" or "F_MEDIAL" or "F_LATERAL" or "F_TOTAL"
         filled_data: np.ndarray [3D] if "ACC" or "GYRO"
         """
+        
         if self.filled_data_l_f_heel is None:
             self.fill_missing_data()
 
