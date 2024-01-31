@@ -149,13 +149,58 @@ class DataForceplates(Data.Data):
         # Redefine time attribut
         self.pre_processed_time = self.time     ## TODO: move to set_zero
 
-    # def set_zero(self):
+    def set_zero(self):
+        if self.pre_processed_data_f1 is None:
+            self.change_orientation()
+
+        # Mean values of force on the 1000 first samples
+        mean_fx1 = np.mean(self.pre_processed_data_f1[0:1000,0])
+        mean_fy1 = np.mean(self.pre_processed_data_f1[0:1000,1])
+        mean_fz1 = np.mean(self.pre_processed_data_f1[0:1000,2])
+
+        mean_fx2 = np.mean(self.pre_processed_data_f2[0:1000,0])
+        mean_fy2 = np.mean(self.pre_processed_data_f2[0:1000,1])
+        mean_fz2 = np.mean(self.pre_processed_data_f2[0:1000,2])
+
+        mean_fx3 = np.mean(self.pre_processed_data_f3[0:1000,0])
+        mean_fy3 = np.mean(self.pre_processed_data_f3[0:1000,1])
+        mean_fz3 = np.mean(self.pre_processed_data_f3[0:1000,2])
+
+        mean_fx4 = np.mean(self.pre_processed_data_f4[0:1000,0])
+        mean_fy4 = np.mean(self.pre_processed_data_f4[0:1000,1])
+        mean_fz4 = np.mean(self.pre_processed_data_f4[0:1000,2])
+
+        mean_fx5 = np.mean(self.pre_processed_data_f5[0:1000,0])
+        mean_fy5 = np.mean(self.pre_processed_data_f5[0:1000,1])
+        mean_fz5 = np.mean(self.pre_processed_data_f5[0:1000,2])
+
+        # Substract the mean value to the data
+        self.pre_processed_data_f1[:,0] -= mean_fx1
+        self.pre_processed_data_f1[:,1] -= mean_fy1
+        self.pre_processed_data_f1[:,2] -= mean_fz1
+
+        self.pre_processed_data_f2[:,0] -= mean_fx2
+        self.pre_processed_data_f2[:,1] -= mean_fy2
+        self.pre_processed_data_f2[:,2] -= mean_fz2
+
+        self.pre_processed_data_f3[:,0] -= mean_fx3
+        self.pre_processed_data_f3[:,1] -= mean_fy3
+        self.pre_processed_data_f3[:,2] -= mean_fz3
+
+        self.pre_processed_data_f4[:,0] -= mean_fx4
+        self.pre_processed_data_f4[:,1] -= mean_fy4
+        self.pre_processed_data_f4[:,2] -= mean_fz4
+
+        self.pre_processed_data_f5[:,0] -= mean_fx5
+        self.pre_processed_data_f5[:,1] -= mean_fy5
+        self.pre_processed_data_f5[:,2] -= mean_fz5
+        
         
     def get_pre_processed_data(self,forceplate_number:int):
         """Returns specific attributes "pre_processed_data" of the DataForceplates class."""
 
         if self.pre_processed_data_f1 is None:
-            self.change_orientation()   ## TODO: change to set_zero
+            self.set_zero()
 
         # Get pre-processed data
         match forceplate_number:
@@ -177,7 +222,7 @@ class DataForceplates(Data.Data):
         try:
             return self.pre_processed_time
         except:
-            self.change_orientation()       ## TODO: change to set_zero
+            self.pre_processed_time = self.get_time()       ## TODO: change to set_zero
             return self.pre_processed_time
 
 
@@ -195,7 +240,7 @@ class DataForceplates(Data.Data):
 if __name__ == "__main__":
     curr_path = getcwd()
 
-    test = DataForceplates(curr_path + "\\examples\\data\\test_poussee_4_fp.c3d", frequency=1000)
+    test = DataForceplates(curr_path + "\\examples\\data\\test_poussee_1.c3d", frequency=1000)
     print(f"Time: {test.time}")
 
     print(f"File name: {test.file_name}")
@@ -222,7 +267,12 @@ if __name__ == "__main__":
     plt.plot(test.time,test.pre_processed_data_f1)
     plt.show()
 
-    
+    plt.plot(test.time,test.pre_processed_data_f1,label="before zero setting")
+    test.set_zero()
+    plt.plot(test.time,test.pre_processed_data_f1,label="after zero setting")
+    plt.legend()
+    plt.show()
+
     resampled_data_fp1 = test.downsample(200,forceplate_number=1)
     resampled_time = test.downsample(200, time=test.time)
     
