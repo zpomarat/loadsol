@@ -76,7 +76,7 @@ class DataForceplates(Data.Data):
             self.c3d_reader_forceplates()
 
         # Set forceplate frequency
-        FP_FREQUENCY = 1000
+        FP_FREQUENCY = self.frequency
 
         self.time = np.arange(0,len(self.raw_data)/FP_FREQUENCY,1/FP_FREQUENCY)
 
@@ -146,8 +146,6 @@ class DataForceplates(Data.Data):
         self.pre_processed_data_f4 = -self.pre_processed_data_f4
         self.pre_processed_data_f5 = -self.pre_processed_data_f5
 
-        # Redefine time attribut
-        self.pre_processed_time = self.time     ## TODO: move to set_zero
 
     def set_zero(self):
         if self.pre_processed_data_f1 is None:
@@ -194,6 +192,9 @@ class DataForceplates(Data.Data):
         self.pre_processed_data_f5[:,0] -= mean_fx5
         self.pre_processed_data_f5[:,1] -= mean_fy5
         self.pre_processed_data_f5[:,2] -= mean_fz5
+
+        # Redefine time attribut
+        self.pre_processed_time = self.time
         
         
     def get_pre_processed_data(self,forceplate_number:int):
@@ -222,7 +223,7 @@ class DataForceplates(Data.Data):
         try:
             return self.pre_processed_time
         except:
-            self.pre_processed_time = self.get_time()       ## TODO: change to set_zero
+            self.pre_processed_time = self.set_zero()
             return self.pre_processed_time
 
 
