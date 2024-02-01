@@ -15,6 +15,7 @@ class DataForceplates(Data.Data):
         self.raw_data_f1 = None
         self.pre_processed_data_f1 = None
         self.pre_processed_time = None
+        self.filled_time = None
 
 
     def set_timestamp(self):
@@ -223,7 +224,7 @@ class DataForceplates(Data.Data):
         """Returns the pre-processed time vector.
         """
         if self.pre_processed_time is None:
-            self.get_time()
+            self.pre_processed_time = self.get_time()
     
         return self.pre_processed_time
         
@@ -231,11 +232,9 @@ class DataForceplates(Data.Data):
     def get_filled_time(self):
         """Returns the pre-processed time vector.
         """
-        try:
-            return self.filled_time
-        except:
-            self.filled_time = self.pre_processed_time
-            return self.filled_time
+        if self.filled_time is None:
+            self.filled_time = self.get_pre_processed_time()
+        return self.filled_time
 
 
 
