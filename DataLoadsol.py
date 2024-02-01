@@ -162,9 +162,9 @@ class DataLoadsol(Data):
         self.raw_data_l_acc = self.raw_data[:, 6:9]
         self.raw_data_l_gyro = self.raw_data[:, 9:12]
 
-        self.raw_data_r_f_heel = self.raw_data[:, 13]
+        self.raw_data_r_f_heel = self.raw_data[:, 15]
         self.raw_data_r_f_medial = self.raw_data[:, 14]
-        self.raw_data_r_f_lateral = self.raw_data[:, 15]
+        self.raw_data_r_f_lateral = self.raw_data[:, 13]
         self.raw_data_r_f_total = self.raw_data[:, 16]
         self.raw_data_r_acc = self.raw_data[:, 18:21]
         self.raw_data_r_gyro = self.raw_data[:, 21:24]
@@ -198,11 +198,11 @@ class DataLoadsol(Data):
             case "LEFT", "GYRO":
                 raw_data = self.raw_data[:, 9:12]
             case "RIGHT", "F_HEEL":
-                raw_data = self.raw_data[:, 13]
+                raw_data = self.raw_data[:, 15]
             case "RIGHT", "F_MEDIAL":
                 raw_data = self.raw_data[:, 14]
             case "RIGHT", "F_LATERAL":
-                raw_data = self.raw_data[:, 15]
+                raw_data = self.raw_data[:, 13]
             case "RIGHT", "F_TOTAL":
                 raw_data = self.raw_data[:, 16]
             case "RIGHT", "ACC":
@@ -284,7 +284,6 @@ class DataLoadsol(Data):
         ]
 
         # Frequency
-        # FREQUENCY = 1 / (self.raw_time_left[1] - self.raw_time_left[0])
         FREQUENCY = self.frequency
 
         # Replace by nan values the line before the line corresponding to the index identified for the left side
@@ -335,9 +334,9 @@ class DataLoadsol(Data):
             case "LEFT", "F_HEEL":
                 pre_processed_data = self.pre_processed_data_l_f_heel
             case "LEFT", "F_MEDIAL":
-                pre_processed_data = self.pre_processed_data_l_f_lateral
-            case "LEFT", "F_LATERAL":
                 pre_processed_data = self.pre_processed_data_l_f_medial
+            case "LEFT", "F_LATERAL":
+                pre_processed_data = self.pre_processed_data_l_f_lateral
             case "LEFT", "F_TOTAL":
                 pre_processed_data = self.pre_processed_data_l_f_total
             case "LEFT", "ACC":
@@ -347,9 +346,9 @@ class DataLoadsol(Data):
             case "RIGHT", "F_HEEL":
                 pre_processed_data = self.pre_processed_data_r_f_heel
             case "RIGHT", "F_MEDIAL":
-                pre_processed_data = self.pre_processed_data_r_f_lateral
-            case "RIGHT", "F_LATERAL":
                 pre_processed_data = self.pre_processed_data_r_f_medial
+            case "RIGHT", "F_LATERAL":
+                pre_processed_data = self.pre_processed_data_r_f_lateral
             case "RIGHT", "F_TOTAL":
                 pre_processed_data = self.pre_processed_data_r_f_total
             case "RIGHT", "ACC":
@@ -417,7 +416,7 @@ class DataLoadsol(Data):
                         max_nan_to_delete = max(max_nan_to_delete, itr)
 
 
-        print(f"Max nan to delete: " + str(max_nan_to_delete))
+        # print(f"Max nan to delete: " + str(max_nan_to_delete))
 
         # Truncate nan values
         if max_nan_to_delete>0:
@@ -533,9 +532,9 @@ class DataLoadsol(Data):
             case "LEFT", "F_HEEL":
                 filled_data = self.filled_data_l_f_heel
             case "LEFT", "F_MEDIAL":
-                filled_data = self.filled_data_l_f_lateral
-            case "LEFT", "F_LATERAL":
                 filled_data = self.filled_data_l_f_medial
+            case "LEFT", "F_LATERAL":
+                filled_data = self.filled_data_l_f_lateral
             case "LEFT", "F_TOTAL":
                 filled_data = self.filled_data_l_f_total
             case "LEFT", "ACC":
@@ -545,9 +544,9 @@ class DataLoadsol(Data):
             case "RIGHT", "F_HEEL":
                 filled_data = self.filled_data_r_f_heel
             case "RIGHT", "F_MEDIAL":
-                filled_data = self.filled_data_r_f_lateral
-            case "RIGHT", "F_LATERAL":
                 filled_data = self.filled_data_r_f_medial
+            case "RIGHT", "F_LATERAL":
+                filled_data = self.filled_data_r_f_lateral
             case "RIGHT", "F_TOTAL":
                 filled_data = self.filled_data_r_f_total
             case "RIGHT", "ACC":
