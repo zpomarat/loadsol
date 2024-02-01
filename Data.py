@@ -74,3 +74,12 @@ class Data:
         return self.filtered_data
     
     
+    def sync_signals(self,order = 4, cutoff_frequency = 10, sampling_frequency = 1, column = 2, start_sync = 0,dimension_1=False, insole_side = None, data_type = None, forceplate_number = None, time = None):
+        if time is not None:
+            return self.downsample(final_frequency=200, time= True)[start_sync:]
+        if data_type is not None:
+            data = self.get_filled_data(insole_side, data_type)
+            return data[start_sync:]
+        if forceplate_number is not None:    
+            data = self.filter_data(order = order, cutoff_frequency= cutoff_frequency, sampling_frequency=sampling_frequency, column=column,dimension_1=dimension_1,forceplate_number=forceplate_number) # Raw data from forceplate
+            return data[start_sync:]
