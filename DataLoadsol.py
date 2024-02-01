@@ -16,6 +16,7 @@ class DataLoadsol(Data):
         self.pre_processed_data_l_f_heel = None
         self.pre_processed_time = None
         self.filled_data_l_f_heel = None
+        self.filled_time = None
         self.path_csv = self.path[:-3] + "csv"
 
     def convert_txt_to_csv(self, output_directory: str):
@@ -419,19 +420,22 @@ class DataLoadsol(Data):
         print(f"Max nan to delete: " + str(max_nan_to_delete))
 
         # Truncate nan values
-        self.filled_data_l_f_heel = self.filled_data_l_f_heel[:-max_nan_to_delete]
-        self.filled_data_l_f_medial = self.filled_data_l_f_medial[:-max_nan_to_delete]
-        self.filled_data_l_f_lateral = self.filled_data_l_f_lateral[:-max_nan_to_delete]
-        self.filled_data_l_f_total = self.filled_data_l_f_total[:-max_nan_to_delete]
-        self.filled_data_l_acc = self.filled_data_l_acc[:-max_nan_to_delete]
-        self.filled_data_l_gyro = self.filled_data_l_gyro[:-max_nan_to_delete]
-        self.filled_data_r_f_heel = self.filled_data_r_f_heel[:-max_nan_to_delete]
-        self.filled_data_r_f_medial = self.filled_data_r_f_medial[:-max_nan_to_delete]
-        self.filled_data_r_f_lateral = self.filled_data_r_f_lateral[:-max_nan_to_delete]
-        self.filled_data_r_f_total = self.filled_data_r_f_total[:-max_nan_to_delete]
-        self.filled_data_r_acc = self.filled_data_r_acc[:-max_nan_to_delete]
-        self.filled_data_r_gyro = self.filled_data_r_gyro[:-max_nan_to_delete]
-        self.filled_time = self.pre_processed_time[:-max_nan_to_delete]
+        if max_nan_to_delete>0:
+            self.filled_data_l_f_heel = self.filled_data_l_f_heel[:-max_nan_to_delete]
+            self.filled_data_l_f_medial = self.filled_data_l_f_medial[:-max_nan_to_delete]
+            self.filled_data_l_f_lateral = self.filled_data_l_f_lateral[:-max_nan_to_delete]
+            self.filled_data_l_f_total = self.filled_data_l_f_total[:-max_nan_to_delete]
+            self.filled_data_l_acc = self.filled_data_l_acc[:-max_nan_to_delete]
+            self.filled_data_l_gyro = self.filled_data_l_gyro[:-max_nan_to_delete]
+            self.filled_data_r_f_heel = self.filled_data_r_f_heel[:-max_nan_to_delete]
+            self.filled_data_r_f_medial = self.filled_data_r_f_medial[:-max_nan_to_delete]
+            self.filled_data_r_f_lateral = self.filled_data_r_f_lateral[:-max_nan_to_delete]
+            self.filled_data_r_f_total = self.filled_data_r_f_total[:-max_nan_to_delete]
+            self.filled_data_r_acc = self.filled_data_r_acc[:-max_nan_to_delete]
+            self.filled_data_r_gyro = self.filled_data_r_gyro[:-max_nan_to_delete]
+            self.filled_time = self.pre_processed_time[:-max_nan_to_delete]
+        else:
+            self.filled_time = self.pre_processed_time
 
         # Convert the data to fill into dataframe
         data_l_f_heel = pd.DataFrame(self.filled_data_l_f_heel)
@@ -508,6 +512,7 @@ class DataLoadsol(Data):
         self.filled_data_r_f_total = data_r_f_total_filled
         self.filled_data_r_acc = data_r_acc_filled
         self.filled_data_r_gyro = data_r_gyro_filled
+
 
     def get_filled_data(self, insole_side, data_type):
         """Returns specific attributes "filled_data" of the DataLoadSol class.
