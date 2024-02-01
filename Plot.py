@@ -6,6 +6,7 @@ from DataLoadsol import DataLoadsol
 from DataForceplates import DataForceplates
 import matplotlib.pyplot as plt
 
+####################################################################################################""
 ## Define the working directory
 curr_path = getcwd()
 working_directory = curr_path + "\\examples\\data\\"
@@ -32,6 +33,7 @@ c3d_files = [
     "test_poussee_3.c3d",
 ]
 
+##############################################################################################################""
 ## Define DataLoadsol objects
 poids_ls = DataLoadsol(path=working_directory + txt_files[0], frequency=200)
 pointe_1_ls = DataLoadsol(path=working_directory + txt_files[1], frequency=200)
@@ -50,6 +52,7 @@ pointe_1_fp = DataForceplates(path=working_directory + c3d_files[1], frequency=1
 # poussee_2_fp = DataForceplates(path=working_directory + c3d_files[5], frequency=1000)
 poussee_3_fp = DataForceplates(path=working_directory + c3d_files[6], frequency=1000)
 
+############################################################################################################
 ## Convert txt files into csv files
 if "test_poids.csv" in listdir(working_directory):
     print("txt files already converted into csv files.")
@@ -64,6 +67,7 @@ else:
     poussee_3_ls.convert_txt_to_csv(working_directory)
     print("txt files converted into csv files.")
 
+###############################################################################################################
 ## Get variables of interest
 # Insoles time
 poids_time_ls = poids_ls.get_filled_time()
@@ -101,7 +105,7 @@ pointe_1_l_gyro = pointe_1_ls.get_filled_data(insole_side="LEFT", data_type="GYR
 # poussee_2_l_gyro = poussee_2_ls.get_filled_data(insole_side="LEFT", data_type="GYRO")
 poussee_3_l_gyro = poussee_3_ls.get_filled_data(insole_side="LEFT", data_type="GYRO")
 
-# Angular of the right insole
+# Angular velocity of the right insole
 poids_r_gyro = poids_ls.get_filled_data(insole_side="RIGHT", data_type="GYRO")
 pointe_1_r_gyro = pointe_1_ls.get_filled_data(insole_side="RIGHT", data_type="GYRO")
 # pointe_3_r_gyro = pointe_3_ls.get_filled_data(insole_side="RIGHT", data_type="GYRO")
@@ -207,51 +211,96 @@ poussee_3_r_ftotal = poussee_3_ls.get_filled_data(
 )
 
 # Forceplates time
+poids_time_fp = poids_fp.get_filled_time()
+pointe_1_time_fp = pointe_1_fp.get_filled_time()
+# pointe_3_time_fp = pointe_3_fp.get_filled_time()
+# pointe_5_time_fp = pointe_5_fp.get_filled_time()
+# poussee_1_time_fp = poussee_1_fp.get_filled_time()
+# poussee_2_time_fp = poussee_2_fp.get_filled_time()
+poussee_3_time_fp = poussee_3_fp.get_filled_time()
+
+# Forces on the forceplate number 1 (left foot)
+poids_fp1 = poids_fp.get_pre_processed_data(forceplate_number=1)
+pointe_1_fp1 = pointe_1_fp.get_pre_processed_data(forceplate_number=1)
+# pointe_3_fp1 = pointe_3_fp.get_pre_processed_data(forceplate_number=1)
+# pointe_5_fp1 = pointe_5_fp.get_pre_processed_data(forceplate_number=1)
+# poussee_1_fp1 = poussee_1_fp.get_pre_processed_data(forceplate_number=1)
+# poussee_2_fp1 = poussee_2_fp.get_pre_processed_data(forceplate_number=1)
+poussee_3_fp1 = poussee_3_fp.get_pre_processed_data(forceplate_number=1)
+
+# Forces on the forceplate number 2 (right foot)
+poids_fp2 = poids_fp.get_pre_processed_data(forceplate_number=2)
+pointe_1_fp2 = pointe_1_fp.get_pre_processed_data(forceplate_number=2)
+# pointe_3_fp2 = pointe_3_fp.get_pre_processed_data(forceplate_number=2)
+# pointe_5_fp2 = pointe_5_fp.get_pre_processed_data(forceplate_number=2)
+# poussee_1_fp2 = poussee_1_fp.get_pre_processed_data(forceplate_number=2)
+# poussee_2_fp2 = poussee_2_fp.get_pre_processed_data(forceplate_number=2)
+poussee_3_fp2 = poussee_3_fp.get_pre_processed_data(forceplate_number=2)
+
+
+#################################################################################################################
+## Downsample forceplate data
+# Forceplates time
 poids_time_fp_ds = poids_fp.downsample(
-    final_frequency=200, time=poids_fp.get_filled_time()
+    final_frequency=200, time=poids_time_fp
 )
-pointe_1_time_fp = pointe_1_fp.downsample(
-    final_frequency=200, time=pointe_1_fp.get_filled_time()
+pointe_1_time_fp_ds = pointe_1_fp.downsample(
+    final_frequency=200, time=pointe_1_time_fp
 )
-# pointe_3_time_fp = pointe_3_fp.downsample(final_frequency=200,time=pointe_3_fp.get_filled_time())
-# pointe_5_time_fp = pointe_5_fp.downsample(final_frequency=200,time=pointe_5_fp.get_filled_time())
-# poussee_1_time_fp = poussee_1_fp.downsample(final_frequency=200,time=poussee_1_fp.get_filled_time())
-# poussee_2_time_fp = poussee_2_fp.downsample(final_frequency=200,time=poussee_2_fp.get_filled_time())
-poussee_3_time_fp = poussee_3_fp.downsample(
-    final_frequency=200, time=poussee_3_fp.get_filled_time()
+# pointe_3_time_fp_ds = pointe_3_fp.downsample(final_frequency=200,time=pointe_3_time_fp)
+# pointe_5_time_fp_ds = pointe_5_fp.downsample(final_frequency=200,time=pointe_5_time_fp)
+# poussee_1_time_fp_ds = poussee_1_fp.downsample(final_frequency=200,time=poussee_1_time_fp)
+# poussee_2_time_fp_ds = poussee_2_fp.downsample(final_frequency=200,time=poussee_2_time_fp)
+poussee_3_time_fp_ds = poussee_3_fp.downsample(
+    final_frequency=200, time=poussee_3_time_fp
 )
 
 # Forces on the forceplate number 1 (left foot)
-poids_fp1 = poids_fp.downsample(final_frequency=200, forceplate_number=1)
-pointe_1_fp1 = pointe_1_fp.downsample(final_frequency=200, forceplate_number=1)
-# pointe_3_fp1 = pointe_3_fp.downsample(final_frequency=200,forceplate_number=1)
-# pointe_5_fp1 = pointe_5_fp.downsample(final_frequency=200,forceplate_number=1)
-# poussee_1_fp1 = poussee_1_fp.downsample(final_frequency=200,forceplate_number=1)
-# poussee_2_fp1 = poussee_2_fp.downsample(final_frequency=200,forceplate_number=1)
-poussee_3_fp1 = poussee_3_fp.downsample(final_frequency=200, forceplate_number=1)
+poids_fp1_ds = poids_fp.downsample(final_frequency=200, forceplate_number=1)
+pointe_1_fp1_ds = pointe_1_fp.downsample(final_frequency=200, forceplate_number=1)
+# pointe_3_fp1_ds = pointe_3_fp.downsample(final_frequency=200,forceplate_number=1)
+# pointe_5_fp1_ds = pointe_5_fp.downsample(final_frequency=200,forceplate_number=1)
+# poussee_1_fp1_ds = poussee_1_fp.downsample(final_frequency=200,forceplate_number=1)
+# poussee_2_fp1_ds = poussee_2_fp.downsample(final_frequency=200,forceplate_number=1)
+poussee_3_fp1_ds = poussee_3_fp.downsample(final_frequency=200, forceplate_number=1)
 
 # Forces on the forceplate number 2 (right foot)
-poids_fp2 = poids_fp.downsample(final_frequency=200, forceplate_number=2)
-pointe_1_fp2 = pointe_1_fp.downsample(final_frequency=200, forceplate_number=2)
-# pointe_3_fp2 = pointe_3_fp.downsample(final_frequency=200,forceplate_number=2)
-# pointe_5_fp2 = pointe_5_fp.downsample(final_frequency=200,forceplate_number=2)
-# poussee_1_fp2 = poussee_1_fp.downsample(final_frequency=200,forceplate_number=2)
-# poussee_2_fp2 = poussee_2_fp.downsample(final_frequency=200,forceplate_number=2)
-poussee_3_fp2 = poussee_3_fp.downsample(final_frequency=200, forceplate_number=2)
+poids_fp2_ds = poids_fp.downsample(final_frequency=200, forceplate_number=2)
+pointe_1_fp2_ds = pointe_1_fp.downsample(final_frequency=200, forceplate_number=2)
+# pointe_3_fp2_ds = pointe_3_fp.downsample(final_frequency=200,forceplate_number=2)
+# pointe_5_fp2_ds = pointe_5_fp.downsample(final_frequency=200,forceplate_number=2)
+# poussee_1_fp2_ds = poussee_1_fp.downsample(final_frequency=200,forceplate_number=2)
+# poussee_2_fp2_ds = poussee_2_fp.downsample(final_frequency=200,forceplate_number=2)
+poussee_3_fp2_ds = poussee_3_fp.downsample(final_frequency=200, forceplate_number=2)
 
-# Filter forceplates data
+###################################################################################################################
+## Filter forceplates data
 poids_fp1_z_filtered = poids_fp.filter_data(
-    order=4, cutoff_frequency=10, sampling_frequency=5, data=poids_fp1, column=2
+    order=4, cutoff_frequency=10, sampling_frequency=1, data=poids_fp1_ds, column=2
 )
 pointe_1_fp1_z_filtered = pointe_1_fp.filter_data(
-    order=2, cutoff_frequency=4, sampling_frequency=2, data=pointe_1_fp1, column=2
+    order=4, cutoff_frequency=10, sampling_frequency=1, data=pointe_1_fp1_ds, column=2
 )
 
+########################################################################################################################
+# Synchronise data
+pointe_1_time_ls_sync = pointe_1_time_ls[3488:]
+pointe_1_time_ls_sync -= pointe_1_time_ls_sync[0]
+pointe_1_l_fheel_sync = pointe_1_l_fheel[3488:]
+pointe_1_l_fmedial_sync = pointe_1_l_fmedial[3488:]
+pointe_1_l_flateral_sync = pointe_1_l_flateral[3488:]
+pointe_1_l_ftotal_sync = pointe_1_l_ftotal[3488:]
+pointe_1_time_fp_sync = pointe_1_time_fp_ds[int(16773/5):]
+pointe_1_time_fp_sync -= pointe_1_time_fp_sync[0]
+pointe_1_fp1_z_sync = pointe_1_fp1_z_filtered[int(16773/5):]
 
-plt.plot(pointe_1_time_ls, pointe_1_l_fheel, label="heel")
-plt.plot(pointe_1_time_ls, pointe_1_l_fmedial, label="medial")
-plt.plot(pointe_1_time_ls, pointe_1_l_flateral, label="lateral")
-plt.plot(pointe_1_time_ls, pointe_1_l_ftotal, label="total")
-plt.plot(pointe_1_time_fp, pointe_1_fp1_z_filtered, label="Fz")
+#######################################################################################################################
+# Plot
+
+plt.plot(pointe_1_time_ls_sync, pointe_1_l_fheel_sync, label="heel")
+plt.plot(pointe_1_time_ls_sync, pointe_1_l_fmedial_sync, label="medial")
+plt.plot(pointe_1_time_ls_sync, pointe_1_l_flateral_sync, label="lateral")
+plt.plot(pointe_1_time_ls_sync, pointe_1_l_ftotal_sync, label="total")
+plt.plot(pointe_1_time_fp_sync, pointe_1_fp1_z_sync, label="Fz")
 plt.legend()
 plt.show()
