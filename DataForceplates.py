@@ -99,7 +99,7 @@ class DataForceplates(Data.Data):
             self.c3d_reader_forceplates()
 
         self.raw_data_f1 = self.raw_data[:,0:3]
-        self.raw_data_f2 = self.raw_data[:,6:10]
+        self.raw_data_f2 = self.raw_data[:,6:9]
         self.raw_data_f3 = self.raw_data[:,12:15]
         self.raw_data_f4 = self.raw_data[:,18:21]
         self.raw_data_f5 = self.raw_data[:,24:27]
@@ -120,7 +120,7 @@ class DataForceplates(Data.Data):
             case 1:
                 raw_data = self.raw_data[:,0:3]
             case 2:
-                raw_data = self.raw_data[:,6:10]
+                raw_data = self.raw_data[:,6:9]
             case 3:
                 raw_data = self.raw_data[:,12:15]
             case 4:
