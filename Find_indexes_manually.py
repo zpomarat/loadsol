@@ -59,7 +59,7 @@ poussee_1_fp = DataForceplates(path=working_directory + c3d_files[4], frequency=
 poussee_2_fp = DataForceplates(path=working_directory + c3d_files[5], frequency=1000)
 poussee_3_fp = DataForceplates(path=working_directory + c3d_files[6], frequency=1000)
 
-# Convert txt files into csv files  ## TODO: csv conversion doesn't work correctly
+# Convert txt files into csv files
 if "test_poids.csv" in listdir(working_directory):
     print("txt files already converted into csv files.")
     pass
@@ -83,17 +83,17 @@ poussee_1_pp_time_ls = poussee_1_ls.get_pre_processed_time()
 poussee_2_pp_time_ls = poussee_2_ls.get_pre_processed_time()
 poussee_3_pp_time_ls = poussee_3_ls.get_pre_processed_time()
 
-# Acceleration of one insole (both are synchronised)
-poids_pp_l_acc = poids_ls.get_pre_processed_data(insole_side="LEFT", data_type="ACC")
-pointe_1_pp_l_acc = pointe_1_ls.get_pre_processed_data(insole_side="LEFT", data_type="ACC")
-pointe_3_pp_l_acc = pointe_3_ls.get_pre_processed_data(insole_side="LEFT", data_type="ACC")
-pointe_5_pp_l_acc = pointe_5_ls.get_pre_processed_data(insole_side="LEFT", data_type="ACC")
-poussee_1_pp_l_acc = poussee_1_ls.get_pre_processed_data(insole_side="LEFT", data_type="ACC")
-poussee_2_pp_l_acc = poussee_2_ls.get_pre_processed_data(insole_side="LEFT", data_type="ACC")
-poussee_3_pp_l_acc = poussee_3_ls.get_pre_processed_data(insole_side="LEFT", data_type="ACC")
+# Acceleration of the right insole (both are synchronised and the starting is defined by the right foot)
+poids_pp_r_acc = poids_ls.get_pre_processed_data(insole_side="RIGHT", data_type="ACC")
+pointe_1_pp_r_acc = pointe_1_ls.get_pre_processed_data(insole_side="RIGHT", data_type="ACC")
+pointe_3_pp_r_acc = pointe_3_ls.get_pre_processed_data(insole_side="RIGHT", data_type="ACC")
+pointe_5_pp_r_acc = pointe_5_ls.get_pre_processed_data(insole_side="RIGHT", data_type="ACC")
+poussee_1_pp_r_acc = poussee_1_ls.get_pre_processed_data(insole_side="RIGHT", data_type="ACC")
+poussee_2_pp_r_acc = poussee_2_ls.get_pre_processed_data(insole_side="RIGHT", data_type="ACC")
+poussee_3_pp_r_acc = poussee_3_ls.get_pre_processed_data(insole_side="RIGHT", data_type="ACC")
 
 # Forceceplate force in z direction for the forceplates 1 and 2
-poids_pp_fp2 = poids_fp.get_pre_processed_data(forceplate_number=2)
+poids_pp_fp4 = poids_fp.get_pre_processed_data(forceplate_number=4)
 pointe_1_pp_fp2 = pointe_1_fp.get_pre_processed_data(forceplate_number=2)
 pointe_3_pp_fp2 = pointe_3_fp.get_pre_processed_data(forceplate_number=2)
 pointe_5_pp_fp2 = pointe_5_fp.get_pre_processed_data(forceplate_number=2)
@@ -142,23 +142,66 @@ poussee_2_fp_ts.time = poussee_2_pp_time_fp
 poussee_3_ls_ts.time = poussee_3_pp_time_ls
 poussee_3_fp_ts.time = poussee_3_pp_time_fp
 
-poids_ls_ts.data = poids_pp_l_acc
-poids_fp_ts.data = poids_pp_time_fp
-pointe_1_ls_ts.data = pointe_1_pp_l_acc
-pointe_1_fp_ts.data = pointe_1_pp_fp2
-pointe_3_ls_ts.data = pointe_3_pp_l_acc
-pointe_3_fp_ts.data = pointe_3_pp_fp2
-pointe_5_ls_ts.data = pointe_5_pp_l_acc
-pointe_5_fp_ts.data = pointe_5_pp_fp2
-poussee_1_ls_ts.data = poussee_1_pp_l_acc
-poussee_1_fp_ts.data = poussee_1_pp_fp2
-poussee_2_ls_ts.data = poussee_2_pp_l_acc
-poussee_2_fp_ts.data = poussee_2_pp_fp2
-poussee_3_ls_ts.data = poussee_3_pp_l_acc
-poussee_3_fp_ts.data = poussee_3_pp_fp2
+poids_ls_ts.data = {'acc':poids_pp_r_acc}
+poids_fp_ts.data = {'f':poids_pp_fp4}
+pointe_1_ls_ts.data = {'acc':pointe_1_pp_r_acc}
+pointe_1_fp_ts.data = {'f':pointe_1_pp_fp2}
+pointe_3_ls_ts.data = {'acc':pointe_3_pp_r_acc}
+pointe_3_fp_ts.data = {'f':pointe_3_pp_fp2}
+pointe_5_ls_ts.data = {'acc':pointe_5_pp_r_acc}
+pointe_5_fp_ts.data = {'f':pointe_5_pp_fp2}
+poussee_1_ls_ts.data = {'acc':poussee_1_pp_r_acc}
+poussee_1_fp_ts.data = {'f':poussee_1_pp_fp2}
+poussee_2_ls_ts.data = {'acc':poussee_2_pp_r_acc}
+poussee_2_fp_ts.data = {'f':poussee_2_pp_fp2}
+poussee_3_ls_ts.data = {'acc':poussee_3_pp_r_acc}
+poussee_3_fp_ts.data = {'f':poussee_3_pp_fp2}
+
+# Create events manually
+poids_ls_ts = poids_ls_ts.ui_edit_events()
+poids_fp_ts = poids_fp_ts.ui_edit_events()
+pointe_1_ls_ts = pointe_1_ls_ts.ui_edit_events()
+pointe_1_fp_ts = pointe_1_fp_ts.ui_edit_events()
+pointe_3_ls_ts = pointe_3_ls_ts.ui_edit_events()
+pointe_3_fp_ts = pointe_3_fp_ts.ui_edit_events()
+pointe_5_ls_ts = pointe_5_ls_ts.ui_edit_events()
+pointe_5_fp_ts = pointe_5_fp_ts.ui_edit_events()
+poussee_1_ls_ts = poussee_1_ls_ts.ui_edit_events()
+poussee_1_fp_ts = poussee_1_fp_ts.ui_edit_events()
+poussee_2_ls_ts = poussee_2_ls_ts.ui_edit_events()
+poussee_2_fp_ts = poussee_2_fp_ts.ui_edit_events()
+poussee_3_ls_ts = poussee_3_ls_ts.ui_edit_events()
+poussee_3_fp_ts = poussee_3_fp_ts.ui_edit_events()
+
+# Get events
+print(f"Start poids_ls: {poids_ls_ts.get_index_before_event('start')}")
+print(f"Start poids_fp: {poids_fp_ts.get_index_before_event('start')}")
+print(f"Start pointe_1_ls: {pointe_1_ls_ts.get_index_before_event('start')}")
+print(f"Start pointe_1_fp: {pointe_1_fp_ts.get_index_before_event('start')}")
+print(f"Start pointe_3_ls: {pointe_3_ls_ts.get_index_before_event('start')}")
+print(f"Start pointe_3_fp: {pointe_3_fp_ts.get_index_before_event('start')}")
+print(f"Start pointe_5_ls: {pointe_5_ls_ts.get_index_before_event('start')}")
+print(f"Start pointe_5_fp: {pointe_5_fp_ts.get_index_before_event('start')}")
+print(f"Start poussee_1_ls: {poussee_1_ls_ts.get_index_before_event('start')}")
+print(f"Start poussee_1_fp: {poussee_1_fp_ts.get_index_before_event('start')}")
+print(f"Start poussee_2_ls: {poussee_2_ls_ts.get_index_before_event('start')}")
+print(f"Start poussee_2_fp: {poussee_2_fp_ts.get_index_before_event('start')}")
+print(f"Start poussee_3_ls: {poussee_3_ls_ts.get_index_before_event('start')}")
+print(f"Start poussee_3_fp: {poussee_3_fp_ts.get_index_before_event('start')}")
 
 
-
-# for val in [poids_raw_l_acc,pointe_1_raw_l_acc,pointe_3_raw_l_acc, pointe_5_raw_l_acc]:
-#     plt.plot(val)
-# plt.show()
+# # Results:
+# Start poids_ls: 10
+# Start poids_fp: 3847
+# Start pointe_1_ls: 3488
+# Start pointe_1_fp: 16743
+# Start pointe_3_ls: 3465
+# Start pointe_3_fp: 16825
+# Start pointe_5_ls: 3412
+# Start pointe_5_fp: 16598
+# Start poussee_1_ls: 3009
+# Start poussee_1_fp: 13718
+# Start poussee_2_ls: 3165
+# Start poussee_2_fp: 15384
+# Start poussee_3_ls: 3644
+# Start poussee_3_fp: 17745
