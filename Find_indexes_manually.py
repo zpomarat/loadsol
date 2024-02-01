@@ -1,9 +1,5 @@
 # For each files in the examples directory, define manually the indexes of:
 # Start signal: start
-# Start forceplate zero phase: start_zero
-# End forceplate zero phase: end_zero
-# Start trial: start_trial
-# End trial: end_trial.
 
 # To find the indexes of these events, use the kinetics toolkit and the TimeSeries.
 
@@ -11,7 +7,6 @@ from os import getcwd, listdir
 from DataLoadsol import DataLoadsol
 from DataForceplates import DataForceplates
 import kineticstoolkit as ktk
-import matplotlib.pyplot as plt
 ktk.import_extensions()
 ktk.change_defaults()
 
