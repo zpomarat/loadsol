@@ -282,25 +282,54 @@ pointe_1_fp1_z_filtered = pointe_1_fp.filter_data(
     order=4, cutoff_frequency=10, sampling_frequency=1, data=pointe_1_fp1_ds, column=2
 )
 
+pointe_1_fp2_z_filtered = pointe_1_fp.filter_data(
+    order=4, cutoff_frequency=10, sampling_frequency=1, data=pointe_1_fp2_ds, column=2
+)
+
 ########################################################################################################################
 # Synchronise data
 pointe_1_time_ls_sync = pointe_1_time_ls[3488:]
 pointe_1_time_ls_sync -= pointe_1_time_ls_sync[0]
+
 pointe_1_l_fheel_sync = pointe_1_l_fheel[3488:]
 pointe_1_l_fmedial_sync = pointe_1_l_fmedial[3488:]
 pointe_1_l_flateral_sync = pointe_1_l_flateral[3488:]
 pointe_1_l_ftotal_sync = pointe_1_l_ftotal[3488:]
+
+pointe_1_r_fheel_sync = pointe_1_r_fheel[3488:]
+pointe_1_r_fmedial_sync = pointe_1_r_fmedial[3488:]
+pointe_1_r_flateral_sync = pointe_1_r_flateral[3488:]
+pointe_1_r_ftotal_sync = pointe_1_r_ftotal[3488:]
+
 pointe_1_time_fp_sync = pointe_1_time_fp_ds[int(16773/5):]
 pointe_1_time_fp_sync -= pointe_1_time_fp_sync[0]
 pointe_1_fp1_z_sync = pointe_1_fp1_z_filtered[int(16773/5):]
+pointe_1_fp2_z_sync = pointe_1_fp2_z_filtered[int(16773/5):]
 
 #######################################################################################################################
 # Plot
+fig1,axs = plt.subplots(2)
+fig1.suptitle(pointe_1_ls.file_name)
+axs[0].set_title("Left insole")
+axs[0].plot(pointe_1_time_ls_sync, pointe_1_l_fheel_sync, label="heel")
+axs[0].plot(pointe_1_time_ls_sync, pointe_1_l_fmedial_sync, label="medial")
+axs[0].plot(pointe_1_time_ls_sync, pointe_1_l_flateral_sync, label="lateral")
+axs[0].plot(pointe_1_time_ls_sync, pointe_1_l_ftotal_sync, label="total")
+axs[0].plot(pointe_1_time_fp_sync, pointe_1_fp1_z_sync, label="Fz")
 
-plt.plot(pointe_1_time_ls_sync, pointe_1_l_fheel_sync, label="heel")
-plt.plot(pointe_1_time_ls_sync, pointe_1_l_fmedial_sync, label="medial")
-plt.plot(pointe_1_time_ls_sync, pointe_1_l_flateral_sync, label="lateral")
-plt.plot(pointe_1_time_ls_sync, pointe_1_l_ftotal_sync, label="total")
-plt.plot(pointe_1_time_fp_sync, pointe_1_fp1_z_sync, label="Fz")
-plt.legend()
+axs[1].set_title("Right insole")
+axs[1].plot(pointe_1_time_ls_sync, pointe_1_r_fheel_sync, label="heel")
+axs[1].plot(pointe_1_time_ls_sync, pointe_1_r_fmedial_sync, label="medial")
+axs[1].plot(pointe_1_time_ls_sync, pointe_1_r_flateral_sync, label="lateral")
+axs[1].plot(pointe_1_time_ls_sync, pointe_1_r_ftotal_sync, label="total")
+axs[1].plot(pointe_1_time_fp_sync, pointe_1_fp2_z_sync, label="Fz")
+
+axs[0].set_xlabel('Time (s)')
+axs[0].set_ylabel('Force (N)')
+axs[1].set_xlabel('Time (s)')
+axs[1].set_ylabel('Force (N)')
+
+axs[0].legend()
+axs[1].legend()
+fig1.subplots_adjust(hspace=0.3)
 plt.show()
