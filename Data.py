@@ -50,13 +50,20 @@ class Data:
         return self.downsampled_data
     
 
-    def filter_data(self, order : int, cutoff_frequency : float, sampling_frequency:int, data, column, dimension_1=False):
+    def filter_data(self,order : int, cutoff_frequency : float, sampling_frequency:int, column, dimension_1=False, insole_side = None, data_type = None, forceplate_number = None):
         """Apply a butterworth filter with a backward & forward pass.
 
         Args:
             order (int): order of the filter. Note that with the backward & forward pass, this order will be multiplied by 2.
             cutoff_frequency (float): Frequency where the gain drops to 1/sqrt(2) that of the passband (the -3dB point).
         """
+
+        # Get the data 
+        if data_type is not None:
+            data = self.downsample(insole_side = insole_side, data_type=data_type, final_frequency = 200) # Raw data from loadsol
+        if forceplate_number is not None:    
+            data = self.downsample(forceplate_number=forceplate_number, final_frequency=200) # Raw data from forceplate
+
         nyquist = 0.5 * sampling_frequency
         normal_cutoff = cutoff_frequency / nyquist
         b, a = signal.butter(order, Wn=1, fs = normal_cutoff, analog=False)
