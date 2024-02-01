@@ -10,9 +10,11 @@ class DataForceplates(Data.Data):
     def __init__(self, path: str, frequency:int):
         super().__init__(path, frequency)
         # Define some attributs as None only to see whether specific methods have already been called or not.
+        self.time = None
         self.raw_data = None
         self.raw_data_f1 = None
         self.pre_processed_data_f1 = None
+        self.pre_processed_time = None
 
 
     def set_timestamp(self):
@@ -84,11 +86,9 @@ class DataForceplates(Data.Data):
     def get_time(self):
         """Returns the raw time vector.
         """
-        try:
-            return self.time
-        except:
+        if self.time is None:
             self.extract_time()
-            return self.time
+        return self.time
 
 
     def extract_data(self):
@@ -147,7 +147,7 @@ class DataForceplates(Data.Data):
         self.pre_processed_data_f5 = -self.pre_processed_data_f5
 
         # Redefine time attribut
-        self.pre_processed_time = self.time
+        self.pre_processed_time = self.get_time()
 
     def set_zero(self):
         if self.pre_processed_data_f1 is None:
@@ -195,8 +195,8 @@ class DataForceplates(Data.Data):
         self.pre_processed_data_f5[:,1] -= mean_fy5
         self.pre_processed_data_f5[:,2] -= mean_fz5
 
-        # # Redefine time attribut
-        # self.pre_processed_time = self.time
+        # Redefine time attribut
+        self.pre_processed_time = self.get_time()
         
         
     def get_pre_processed_data(self,forceplate_number:int):
@@ -222,11 +222,10 @@ class DataForceplates(Data.Data):
     def get_pre_processed_time(self):
         """Returns the pre-processed time vector.
         """
-        try:
-            return self.pre_processed_time
-        except:
-            self.set_zero()
-            return self.pre_processed_time
+        if self.pre_processed_time is None:
+            self.get_time()
+    
+        return self.pre_processed_time
         
 
     def get_filled_time(self):
