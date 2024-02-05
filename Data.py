@@ -50,7 +50,7 @@ class Data:
         return self.downsampled_data
     
 
-    def filter_data(self,order : int, cutoff_frequency : float, sampling_frequency:int, column, dimension_1=False, insole_side = None, data_type = None, forceplate_number = None):
+    def filter_data(self,order : int, cutoff_frequency : float, sampling_frequency:int, column=2, dimension_1=False, insole_side = None, data_type = None, forceplate_number = None):
         """Apply a butterworth filter with a backward & forward pass.
 
         Args:
@@ -78,7 +78,8 @@ class Data:
         if time is not None:
             return self.downsample(final_frequency=200, time= True)[start_sync:]
         if data_type is not None:
-            data = self.get_filled_data(insole_side, data_type)
+            # data = self.get_filled_data(insole_side, data_type)
+            data = self.filter_data(order = order, cutoff_frequency= cutoff_frequency, sampling_frequency=sampling_frequency,dimension_1=dimension_1, column = column, insole_side =insole_side, data_type=data_type) # Raw data from forceplate
             return data[start_sync:]
         if forceplate_number is not None:    
             data = self.filter_data(order = order, cutoff_frequency= cutoff_frequency, sampling_frequency=sampling_frequency, column=column,dimension_1=dimension_1,forceplate_number=forceplate_number) # Raw data from forceplate
