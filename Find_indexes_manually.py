@@ -25,7 +25,7 @@ txt_files = [
     "test_poussee_1.txt",
     "test_poussee_2.txt",
     "test_poussee_3.txt",
-    "roll_test.txt",
+    "roll_test_3.txt",
     "test_pointe_1_05_02.txt",
     "test_pointe_2_05_02.txt",
     "test_pointe_3_05_02.txt",
@@ -62,6 +62,7 @@ pointe_4_ls_05_02 = DataLoadsol(path=working_directory + txt_files[11], frequenc
 pointe_5_ls_05_02 = DataLoadsol(path=working_directory + txt_files[12], frequency=200)
 poids_par_zone = DataLoadsol(path=working_directory + txt_files[13], frequency=200)
 
+
 # Define DataForceplates objects
 poids_fp = DataForceplates(path=working_directory + c3d_files[0], frequency=1000)
 pointe_1_fp = DataForceplates(path=working_directory + c3d_files[1], frequency=1000)
@@ -72,7 +73,7 @@ poussee_2_fp = DataForceplates(path=working_directory + c3d_files[5], frequency=
 poussee_3_fp = DataForceplates(path=working_directory + c3d_files[6], frequency=1000)
 
 # Convert txt files into csv files
-if "poids_par_zone.csv" in listdir(working_directory):
+if "rolll_test_3.csv" in listdir(working_directory):
     print("txt files already converted into csv files.")
     pass
 else:
