@@ -4,6 +4,7 @@ from DataLoadsol import DataLoadsol
 from DataForceplates import DataForceplates
 from scipy import stats
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 class TrialAnalysis:
@@ -18,6 +19,7 @@ class TrialAnalysis:
         self.DataLoadsol = DataLoadSol
         self.sync_time_forceplate = sync_time_forceplate
         self.sync_time_loadsol = sync_time_loadsol
+        filtering = False
 
         # Times
         if self.DataLoadsol is not None:
@@ -46,24 +48,44 @@ class TrialAnalysis:
             self.l_f_total = self.DataLoadsol.sync_signals(
                 dimension_1=True,insole_side="LEFT", data_type="F_TOTAL", start_sync=self.sync_time_loadsol
             )
-            self.l_accx = self.DataLoadsol.sync_signals(
-                column=0,insole_side="LEFT", data_type="ACC", start_sync=self.sync_time_loadsol
-            )
-            self.l_accy = self.DataLoadsol.sync_signals(
-                column=1,insole_side="LEFT", data_type="ACC", start_sync=self.sync_time_loadsol
-            )
-            self.l_accz = self.DataLoadsol.sync_signals(
-                column=2,insole_side="LEFT", data_type="ACC", start_sync=self.sync_time_loadsol
-            )
-            self.l_gyrox = self.DataLoadsol.sync_signals(
-                column=0,insole_side="LEFT", data_type="GYRO", start_sync=self.sync_time_loadsol
-            )
-            self.l_gyroy = self.DataLoadsol.sync_signals(
-                column=1,insole_side="LEFT", data_type="GYRO", start_sync=self.sync_time_loadsol
-            )
-            self.l_gyroz = self.DataLoadsol.sync_signals(
-                column=2,insole_side="LEFT", data_type="GYRO", start_sync=self.sync_time_loadsol
-            )
+            if filtering is True:
+                self.l_accx = self.DataLoadsol.sync_signals(
+                    column=0,insole_side="LEFT", data_type="ACC", start_sync=self.sync_time_loadsol
+                )
+                self.l_accy = self.DataLoadsol.sync_signals(
+                    column=1,insole_side="LEFT", data_type="ACC", start_sync=self.sync_time_loadsol
+                )
+                self.l_accz = self.DataLoadsol.sync_signals(
+                    column=2,insole_side="LEFT", data_type="ACC", start_sync=self.sync_time_loadsol
+                )
+                self.l_gyrox = self.DataLoadsol.sync_signals(
+                    column=0,insole_side="LEFT", data_type="GYRO", start_sync=self.sync_time_loadsol
+                )
+                self.l_gyroy = self.DataLoadsol.sync_signals(
+                    column=1,insole_side="LEFT", data_type="GYRO", start_sync=self.sync_time_loadsol
+                )
+                self.l_gyroz = self.DataLoadsol.sync_signals(
+                    column=2,insole_side="LEFT", data_type="GYRO", start_sync=self.sync_time_loadsol
+                )
+            else:
+                self.l_accx = self.DataLoadsol.sync_signals(
+                    insole_side="LEFT", data_type="ACC", start_sync=self.sync_time_loadsol
+                )[:,0]
+                self.l_accy = self.DataLoadsol.sync_signals(
+                    insole_side="LEFT", data_type="ACC", start_sync=self.sync_time_loadsol
+                )[:,1]
+                self.l_accz = self.DataLoadsol.sync_signals(
+                    insole_side="LEFT", data_type="ACC", start_sync=self.sync_time_loadsol
+                )[:,2]
+                self.l_gyrox = self.DataLoadsol.sync_signals(
+                    insole_side="LEFT", data_type="GYRO", start_sync=self.sync_time_loadsol
+                )[:,0]
+                self.l_gyroy = self.DataLoadsol.sync_signals(
+                    insole_side="LEFT", data_type="GYRO", start_sync=self.sync_time_loadsol
+                )[:,1]
+                self.l_gyroz = self.DataLoadsol.sync_signals(
+                    insole_side="LEFT", data_type="GYRO", start_sync=self.sync_time_loadsol
+                )[:,2]
 
             # Right
             self.r_f_heel = self.DataLoadsol.sync_signals(
@@ -80,46 +102,122 @@ class TrialAnalysis:
             self.r_f_total = self.DataLoadsol.sync_signals(
                 dimension_1=True,insole_side="RIGHT", data_type="F_TOTAL", start_sync=self.sync_time_loadsol
             )
-            self.r_accx = self.DataLoadsol.sync_signals(
-                column=0,insole_side="RIGHT", data_type="ACC", start_sync=self.sync_time_loadsol
-            )
-            self.r_accy = self.DataLoadsol.sync_signals(
-                column=1,insole_side="RIGHT", data_type="ACC", start_sync=self.sync_time_loadsol
-            )
-            self.r_accz = self.DataLoadsol.sync_signals(
-                column=2,insole_side="RIGHT", data_type="ACC", start_sync=self.sync_time_loadsol
-            )
-            self.r_gyrox = self.DataLoadsol.sync_signals(
-                column=0,insole_side="RIGHT", data_type="GYRO", start_sync=self.sync_time_loadsol
-            )
-            self.r_gyroy = self.DataLoadsol.sync_signals(
-                column=1,insole_side="RIGHT", data_type="GYRO", start_sync=self.sync_time_loadsol
-            )
-            self.r_gyroz = self.DataLoadsol.sync_signals(
-                column=2,insole_side="RIGHT", data_type="GYRO", start_sync=self.sync_time_loadsol
-            )
+            if filtering is True:
+                self.r_accx = self.DataLoadsol.sync_signals(
+                    column=0,insole_side="RIGHT", data_type="ACC", start_sync=self.sync_time_loadsol
+                )
+                self.r_accy = self.DataLoadsol.sync_signals(
+                    column=1,insole_side="RIGHT", data_type="ACC", start_sync=self.sync_time_loadsol
+                )
+                self.r_accz = self.DataLoadsol.sync_signals(
+                    column=2,insole_side="RIGHT", data_type="ACC", start_sync=self.sync_time_loadsol
+                )
+                self.r_gyrox = self.DataLoadsol.sync_signals(
+                    column=0,insole_side="RIGHT", data_type="GYRO", start_sync=self.sync_time_loadsol
+                )
+                self.r_gyroy = self.DataLoadsol.sync_signals(
+                    column=1,insole_side="RIGHT", data_type="GYRO", start_sync=self.sync_time_loadsol
+                )
+                self.r_gyroz = self.DataLoadsol.sync_signals(
+                    column=2,insole_side="RIGHT", data_type="GYRO", start_sync=self.sync_time_loadsol
+                )
+            else:
+                self.r_accx = self.DataLoadsol.sync_signals(
+                    insole_side="RIGHT", data_type="ACC", start_sync=self.sync_time_loadsol
+                )[:,0]
+                self.r_accy = self.DataLoadsol.sync_signals(
+                    insole_side="RIGHT", data_type="ACC", start_sync=self.sync_time_loadsol
+                )[:,1]
+                self.r_accz = self.DataLoadsol.sync_signals(
+                    insole_side="RIGHT", data_type="ACC", start_sync=self.sync_time_loadsol
+                )[:,2]
+                self.r_gyrox = self.DataLoadsol.sync_signals(
+                    insole_side="RIGHT", data_type="GYRO", start_sync=self.sync_time_loadsol
+                )[:,0]
+                self.r_gyroy = self.DataLoadsol.sync_signals(
+                    insole_side="RIGHT", data_type="GYRO", start_sync=self.sync_time_loadsol
+                )[:,1]
+                self.r_gyroz = self.DataLoadsol.sync_signals(
+                    insole_side="RIGHT", data_type="GYRO", start_sync=self.sync_time_loadsol
+                )[:,2]
 
         # Forceplates
-        if self.DataForceplates is not None:
+        if filtering is True:
+            if self.DataForceplates is not None:
+                self.fp1_x = self.DataForceplates.sync_signals(
+                    start_sync=self.sync_time_forceplate, forceplate_number=1, column=0
+                )
+                self.fp1_y = self.DataForceplates.sync_signals(
+                    start_sync=self.sync_time_forceplate, forceplate_number=1, column=1
+                )
+                self.fp1_z = self.DataForceplates.sync_signals(
+                    start_sync=self.sync_time_forceplate, forceplate_number=1, column=2
+                )
+
+                self.fp2_x = self.DataForceplates.sync_signals(
+                    start_sync=self.sync_time_forceplate, forceplate_number=2, column=0
+                )
+                self.fp2_y = self.DataForceplates.sync_signals(
+                    start_sync=self.sync_time_forceplate, forceplate_number=2, column=1
+                )
+                self.fp2_z = self.DataForceplates.sync_signals(
+                    start_sync=self.sync_time_forceplate, forceplate_number=2, column=2
+                )
+        else:
             self.fp1_x = self.DataForceplates.sync_signals(
-                start_sync=self.sync_time_forceplate, forceplate_number=1, column=0
-            )
+                start_sync=self.sync_time_forceplate, forceplate_number=1
+            )[:,0]
             self.fp1_y = self.DataForceplates.sync_signals(
-                start_sync=self.sync_time_forceplate, forceplate_number=1, column=1
-            )
+                start_sync=self.sync_time_forceplate, forceplate_number=1
+            )[:,1]
             self.fp1_z = self.DataForceplates.sync_signals(
-                start_sync=self.sync_time_forceplate, forceplate_number=1, column=2
-            )
+                start_sync=self.sync_time_forceplate, forceplate_number=1,
+            )[:,2]
 
             self.fp2_x = self.DataForceplates.sync_signals(
-                start_sync=self.sync_time_forceplate, forceplate_number=2, column=0
-            )
+                start_sync=self.sync_time_forceplate, forceplate_number=2,
+            )[:,0]
             self.fp2_y = self.DataForceplates.sync_signals(
-                start_sync=self.sync_time_forceplate, forceplate_number=2, column=1
-            )
+                start_sync=self.sync_time_forceplate, forceplate_number=2,
+            )[:,1]
             self.fp2_z = self.DataForceplates.sync_signals(
-                start_sync=self.sync_time_forceplate, forceplate_number=2, column=2
-            )
+                start_sync=self.sync_time_forceplate, forceplate_number=2,
+            )[:,2]
+
+        # Cut signals to the dimension of the smallest one
+        min_len = min(len(self.l_f_heel),len(self.fp1_x))
+
+        self.l_f_heel = self.l_f_heel[:min_len]
+        self.l_f_medial = self.l_f_medial[:min_len]
+        self.l_f_lateral = self.l_f_lateral[:min_len]
+        self.l_f_total = self.l_f_total[:min_len]
+        self.l_accx = self.l_accx[:min_len]
+        self.l_accy = self.l_accy[:min_len]
+        self.l_accz = self.l_accz[:min_len]
+        self.l_gyrox = self.l_gyrox[:min_len]
+        self.l_gyroy = self.l_gyroy[:min_len]
+        self.l_gyroz = self.l_gyroz[:min_len]
+        self.r_f_heel = self.r_f_heel[:min_len]
+        self.r_f_medial = self.r_f_medial[:min_len]
+        self.r_f_lateral = self.r_f_lateral[:min_len]
+        self.r_f_total = self.r_f_total[:min_len]
+        self.r_accx = self.r_accx[:min_len]
+        self.r_accy = self.r_accy[:min_len]
+        self.r_accz = self.r_accz[:min_len]
+        self.r_gyrox = self.r_gyrox[:min_len]
+        self.r_gyroy = self.r_gyroy[:min_len]
+        self.r_gyroz = self.r_gyroz[:min_len]
+        self.fp1_x = self.fp1_x[:min_len]
+        self.fp1_y = self.fp1_y[:min_len]
+        self.fp1_z = self.fp1_z[:min_len]
+        self.fp2_x = self.fp2_x[:min_len]
+        self.fp2_y = self.fp2_y[:min_len]
+        self.fp2_z = self.fp2_z[:min_len]
+
+        self.time_ls = self.time_ls[:min_len]
+        self.time_fp = self.time_fp[:min_len]
+
+
 
     def compare_loadsol_forceplates(self):
         fig1, axs = plt.subplots(2)
@@ -323,6 +421,46 @@ class TrialAnalysis:
                 print(f"Pearson correlation coefficient between Ftot and Accz: {corr_coef_l_ftot_accz[0]}")
 
         
+    def export_csv(self,export_directory,file_name):
+
+        # Data to export
+        data = {"Time": self.time_ls,
+                "F_heel_left": self.l_f_heel,
+                "F_medial_left": self.l_f_medial,
+                "F_lateral_left": self.l_f_lateral,
+                "F_total_left": self.l_f_total,
+                "F_acc_x_left": self.l_accx,
+                "F_acc_y_left": self.l_accy,
+                "F_acc_z_left": self.l_accz,
+                "F_gyro_x_left": self.l_gyrox,
+                "F_gyro_y_left": self.l_gyroy,
+                "F_gyro_z_left": self.l_gyroz,
+                "F_heel_right": self.l_f_heel,
+                "F_medial_right": self.r_f_medial,
+                "F_lateral_right": self.r_f_lateral,
+                "F_total_right": self.r_f_total,
+                "F_acc_x_right": self.r_accx,
+                "F_acc_y_right": self.r_accy,
+                "F_acc_z_right": self.r_accz,
+                "F_gyro_x_right": self.r_gyrox,
+                "F_gyro_y_right": self.r_gyroy,
+                "F_gyro_z_right": self.r_gyroz,
+                "Fx_left": self.fp1_x,
+                "Fy_left": self.fp1_y,
+                "Fz_left": self.fp1_z,
+                "Fx_right": self.fp2_x,
+                "Fy_right": self.fp2_y,
+                "Fz_right": self.fp2_z,
+                }
+
+        # Create a dataframe containing data to export
+        df = pd.DataFrame(data)
+
+        # Export data to a csv file
+        df.to_csv(export_directory + file_name + "_processed.csv")
+
+        
+
 
         
 
@@ -333,13 +471,14 @@ if __name__ == "__main__":
     curr_path = getcwd()
     working_directory = curr_path + "\\examples\\data\\"
 
-    file_name = "poids_par_zone"
-    pointe_3_05_02_ls = DataLoadsol(
+    file_name = "test_poussee_1"
+    poussee_1_ls = DataLoadsol(
         path=working_directory + file_name + ".txt", frequency=200
     )
-    # pointe_1_fp = DataForceplates(
-    #     path=working_directory + file_name + ".c3d", frequency=1000
-    # )
+
+    poussee_1_fp = DataForceplates(
+        path=working_directory + file_name + ".c3d", frequency=1000
+    )
 
     # Trial = TrialAnalysis(
     #     poids_fp,
@@ -369,12 +508,12 @@ if __name__ == "__main__":
     #     sync_time_forceplate=int(16598 / 5),
     # )
 
-    # Trial = TrialAnalysis(
-    #     poussee_1_fp,
-    #     poussee_1_ls,
-    #     sync_time_loadsol=3009,
-    #     sync_time_forceplate=int(13718 / 5),
-    # )
+    Trial = TrialAnalysis(
+        poussee_1_fp,
+        poussee_1_ls,
+        sync_time_loadsol=3009,
+        sync_time_forceplate=int(13718 / 5),
+    )
 
     # Trial = TrialAnalysis(
     #     poussee_2_fp,
@@ -397,19 +536,21 @@ if __name__ == "__main__":
     #     sync_time_forceplate=int(17785 / 5),
     # )
 
-    Trial = TrialAnalysis(
-        DataForceplate=None,
-        DataLoadSol=pointe_3_05_02_ls,
-        sync_time_loadsol=0,
-        sync_time_forceplate=0,
-    )
+    # Trial = TrialAnalysis(
+    #     DataForceplate=None,
+    #     DataLoadSol=pointe_3_05_02_ls,
+    #     sync_time_loadsol=0,
+    #     sync_time_forceplate=0,
+    # )
 
     # Trial.compare_loadsol_forceplates()
-    Trial.plot_ls_forces()
+    # Trial.plot_ls_forces()
     # Trial.test_sum(1,2/3,2/3)
     # Trial.compare_forces_imu()
     # Trial2.compare_forces_imu()
     # Trial.correlation_ftot_acc(direction="x",start_trial=756,end_trial=1040)
     # Trial.correlation_ftot_acc(direction="y",start_trial=756,end_trial=1040)
     # Trial.correlation_ftot_acc(direction="z",start_trial=756,end_trial=1040)
+
+    Trial.export_csv(curr_path + "\\examples\\results\\",file_name)
  
