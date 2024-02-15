@@ -132,6 +132,150 @@ class DataLoadsol:
             "gyro_z_r": raw_data[:, 23],
         }
 
+    def clean_data(self):
+        """Replaces the incorrect values in force data by NaN (incorrect value = negative value of force per zone).
+            Finds and suppresses duplicate data.
+        """
+
+        if self.raw_data is None:
+            self.csv_reader_loadsol()
+            
+        ## Suppress incorrect values 
+        # Initialise data with incorrect values suppressed
+        f_heel_l_incorrect_values_sup = self.raw_data["f_heel_l"]
+        f_medial_l_incorrect_values_sup = self.raw_data["f_medial_l"]
+        f_lateral_l_incorrect_values_sup = self.raw_data["f_lateral_l"]
+        f_total_l_incorrect_values_sup = self.raw_data["f_total_l"]
+
+        f_heel_r_incorrect_values_sup = self.raw_data["f_heel_r"]
+        f_medial_r_incorrect_values_sup = self.raw_data["f_medial_r"]
+        f_lateral_r_incorrect_values_sup = self.raw_data["f_lateral_r"]
+        f_total_r_incorrect_values_sup = self.raw_data["f_total_r"]        
+
+        # Find indexes of incorrect values
+        index_incorrect_values_left = [
+            index for index, item in enumerate(self.raw_data["f_heel_l"]) if item < 0
+        ]
+        index_incorrect_values_right = [
+            index for index, item in enumerate(self.raw_data["f_heel_r"]) if item < 0
+        ]
+
+        # Replace incorrect values by NaN
+        for i in index_incorrect_values_left:
+            f_heel_l_incorrect_values_sup[i] = np.NaN
+            f_medial_l_incorrect_values_sup[i] = np.NaN
+            f_lateral_l_incorrect_values_sup[i] = np.NaN
+            f_total_l_incorrect_values_sup[i] = np.NaN
+
+        for i in index_incorrect_values_right:
+            f_heel_r_incorrect_values_sup[i] = np.NaN
+            f_medial_r_incorrect_values_sup[i] = np.NaN
+            f_lateral_r_incorrect_values_sup[i] = np.NaN
+            f_total_r_incorrect_values_sup[i] = np.NaN
+
+        ## Suppress duplicate data
+        # Initialise data with dupmicate values suppressed
+        time_l_unique = self.raw_data["time_l"]
+        time_r_unique = self.raw_data["time_r"]
+
+        f_heel_l_unique = f_heel_l_incorrect_values_sup
+        f_medial_l_unique = f_medial_l_incorrect_values_sup
+        f_lateral_l_unique = f_lateral_l_incorrect_values_sup
+        f_total_l_unique = f_total_l_incorrect_values_sup
+        acc_x_l_unique = self.raw_data["acc_x_l"]
+        acc_y_l_unique = self.raw_data["acc_y_l"]
+        acc_z_l_unique = self.raw_data["acc_z_l"]
+        gyro_x_l_unique = self.raw_data["gyro_x_l"]
+        gyro_y_l_unique = self.raw_data["gyro_y_l"]
+        gyro_z_l_unique = self.raw_data["gyro_z_l"]
+
+        f_heel_r_unique = f_heel_r_incorrect_values_sup
+        f_medial_r_unique = f_medial_r_incorrect_values_sup
+        f_lateral_r_unique = f_lateral_r_incorrect_values_sup
+        f_total_r_unique = f_total_r_incorrect_values_sup
+        acc_x_r_unique = self.raw_data["acc_x_r"]
+        acc_y_r_unique = self.raw_data["acc_y_r"]
+        acc_z_r_unique = self.raw_data["acc_z_r"]
+        gyro_x_r_unique = self.raw_data["gyro_x_r"]
+        gyro_y_r_unique = self.raw_data["gyro_y_r"]
+        gyro_z_r_unique = self.raw_data["gyro_z_r"]
+
+        # Find indexes of duplicate values
+        index_duplicate_left = [
+            index
+            for index, item in enumerate(self.raw_data["time_l"])
+            if item in self.raw_data["time_l"][:index]
+        ]
+
+        index_duplicate_right = [
+            index
+            for index, item in enumerate(self.raw_data["time_r"])
+            if item in self.raw_data["time_r"][:index]
+        ]
+
+        # Replace by nan values the line before the line corresponding to the index identified for the left side
+        for i in index_duplicate_left:
+            time_l_unique[i - 1] = np.NaN
+            f_heel_l_unique[i - 1] = np.NaN
+            f_medial_l_unique[i - 1] = np.NaN
+            f_lateral_l_unique[i - 1] = np.NaN
+            f_total_l_unique[i - 1] = np.NaN
+            acc_x_l_unique[i - 1] = np.NaN
+            acc_y_l_unique[i - 1] = np.NaN
+            acc_z_l_unique[i - 1] = np.NaN
+            gyro_x_l_unique[i - 1] = np.NaN
+            gyro_y_l_unique[i - 1] = np.NaN
+            gyro_z_l_unique[i - 1] = np.NaN
+
+            # Complete time nan values
+            time_l_unique[i - 1] = (i - 1) / self.frequency
+
+        # Replace by nan values the line before the line corresponding to the index identified for the right side
+        for i in index_duplicate_right:
+            time_r_unique[i - 1] = np.NaN
+            f_heel_r_unique[i - 1] = np.NaN
+            f_medial_r_unique[i - 1] = np.NaN
+            f_lateral_r_unique[i - 1] = np.NaN
+            f_total_r_unique[i - 1] = np.NaN
+            acc_x_r_unique[i - 1] = np.NaN
+            acc_y_r_unique[i - 1] = np.NaN
+            acc_z_r_unique[i - 1] = np.NaN
+            gyro_x_r_unique[i - 1] = np.NaN
+            gyro_y_r_unique[i - 1] = np.NaN
+            gyro_z_r_unique[i - 1] = np.NaN
+
+            # Complete time nan values
+            time_r_unique[i - 1] = (i - 1) / self.frequency
+
+        # Fill the cleaned_data dictionnary
+        self.cleaned_data = {
+            "time_l": time_l_unique,
+            "f_heel_l": f_heel_l_unique,
+            "f_medial_l": f_medial_l_unique,
+            "f_lateral_l": f_lateral_l_unique,
+            "f_total_l": f_total_l_unique,
+            "acc_x_l": acc_x_l_unique,
+            "acc_y_l": acc_y_l_unique,
+            "acc_z_l": acc_z_l_unique,
+            "gyro_x_l": gyro_x_l_unique,
+            "gyro_y_l": gyro_y_l_unique,
+            "gyro_z_l": gyro_z_l_unique,
+            "time_r": time_r_unique,
+            "f_heel_r": f_heel_r_unique,
+            "f_medial_r": f_medial_r_unique,
+            "f_lateral_r": f_lateral_r_unique,
+            "f_total_r": f_total_r_unique,
+            "acc_x_r": acc_x_r_unique,
+            "acc_y_r": acc_y_r_unique,
+            "acc_z_r": acc_z_r_unique,
+            "gyro_x_r": gyro_x_r_unique,
+            "gyro_y_r": gyro_y_r_unique,
+            "gyro_z_r": gyro_z_r_unique
+        }
+
+
+
+
 
 if __name__ == "__main__":
     curr_path = getcwd()
@@ -153,5 +297,15 @@ if __name__ == "__main__":
     plt.plot(test.raw_data["time_l"],test.raw_data["f_lateral_l"],label="lateral")
     plt.plot(test.raw_data["time_l"],test.raw_data["f_total_l"],label="total")
     plt.legend()
-    plt.title("Left insole raw force data")
+    plt.title("Raw force data of the left insole")
+    plt.figure()
+
+    # Clean data: suppres incorrect values and duplicate data
+    test.clean_data()
+    plt.plot(test.cleaned_data["time_l"],test.cleaned_data["f_heel_l"],label="heel")
+    plt.plot(test.cleaned_data["time_l"],test.cleaned_data["f_medial_l"],label="medial")
+    plt.plot(test.cleaned_data["time_l"],test.cleaned_data["f_lateral_l"],label="lateral")
+    plt.plot(test.cleaned_data["time_l"],test.cleaned_data["f_total_l"],label="total")
+    plt.legend()
+    plt.title("Cleaned force data of the left insole")
     plt.show()
