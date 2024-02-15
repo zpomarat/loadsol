@@ -174,7 +174,7 @@ class DataLoadsol:
             f_total_r_incorrect_values_sup[i] = np.NaN
 
         ## Suppress duplicate data
-        # Initialise data with dupmicate values suppressed
+        # Initialise data with duplicate values suppressed
         time_l_unique = self.raw_data["time_l"]
         time_r_unique = self.raw_data["time_r"]
 
@@ -273,6 +273,232 @@ class DataLoadsol:
             "gyro_z_r": gyro_z_r_unique
         }
 
+    def fill_missing_data(self):
+        """Interpolates missing data."""
+
+        if self.cleaned_data is None:
+            self.clean_data()
+
+        # Initialise filled data
+        f_heel_l_filled = self.cleaned_data["f_heel_l"]
+        f_medial_l_filled = self.cleaned_data["f_medial_l"]
+        f_lateral_l_filled = self.cleaned_data["f_lateral_l"]
+        f_total_l_filled = self.cleaned_data["f_total_l"]
+        acc_x_l_filled = self.cleaned_data["acc_x_l"]
+        acc_y_l_filled = self.cleaned_data["acc_y_l"]
+        acc_z_l_filled = self.cleaned_data["acc_z_l"]
+        gyro_x_l_filled = self.cleaned_data["gyro_x_l"]
+        gyro_y_l_filled = self.cleaned_data["gyro_y_l"]
+        gyro_z_l_filled = self.cleaned_data["gyro_z_l"]
+
+        f_heel_r_filled = self.cleaned_data["f_heel_r"]
+        f_medial_r_filled = self.cleaned_data["f_medial_r"]
+        f_lateral_r_filled = self.cleaned_data["f_lateral_r"]
+        f_total_r_filled = self.cleaned_data["f_total_r"]
+        acc_x_r_filled = self.cleaned_data["acc_x_r"]
+        acc_y_r_filled = self.cleaned_data["acc_y_r"]
+        acc_z_r_filled = self.cleaned_data["acc_z_r"]
+        gyro_x_r_filled = self.cleaned_data["gyro_x_r"]
+        gyro_y_r_filled = self.cleaned_data["gyro_y_r"]
+        gyro_z_r_filled = self.cleaned_data["gyro_z_r"]
+
+        time_filled = self.cleaned_data["time_l"]
+
+        # Check if there are nan values at the end of the data array
+        max_nan_to_delete = 0
+        for data_array in [
+            f_heel_l_filled,
+            f_medial_l_filled,
+            f_lateral_l_filled,
+            f_total_l_filled,
+            acc_x_l_filled,
+            acc_y_l_filled,
+            acc_z_l_filled,
+            gyro_x_l_filled,
+            gyro_y_l_filled,
+            gyro_z_l_filled,
+            f_heel_r_filled,
+            f_medial_r_filled,
+            f_lateral_r_filled,
+            f_total_r_filled,
+            acc_x_r_filled,
+            acc_y_r_filled,
+            acc_z_r_filled,
+            gyro_x_r_filled,
+            gyro_y_r_filled,
+            gyro_z_r_filled
+        ]:
+            for itr in range(1, len(data_array)):
+                if type(data_array[0]) == np.float_:
+                    if np.isnan(data_array[-itr])==False:
+                        break
+                    else:
+                        max_nan_to_delete = max(max_nan_to_delete, itr)
+                else:
+                    if False in np.isnan(data_array[-itr]):
+                        break
+                    else:
+                        max_nan_to_delete = max(max_nan_to_delete, itr)
+
+        # Truncate nan values if there are nan values at the end of the data array
+        if max_nan_to_delete>0:
+            f_heel_l_filled = f_heel_l_filled[:-max_nan_to_delete]
+            f_medial_l_filled = f_medial_l_filled[:-max_nan_to_delete]
+            f_lateral_l_filled = f_lateral_l_filled[:-max_nan_to_delete]
+            f_total_l_filled = f_total_l_filled[:-max_nan_to_delete]
+            acc_x_l_filled = acc_x_l_filled[:-max_nan_to_delete]
+            acc_y_l_filled = acc_y_l_filled[:-max_nan_to_delete]
+            acc_z_l_filled = acc_z_l_filled[:-max_nan_to_delete]
+            gyro_x_l_filled = gyro_x_l_filled[:-max_nan_to_delete]
+            gyro_y_l_filled = gyro_y_l_filled[:-max_nan_to_delete]
+            gyro_z_l_filled = gyro_z_l_filled[:-max_nan_to_delete]
+
+            f_heel_r_filled = f_heel_r_filled[:-max_nan_to_delete]
+            f_medial_r_filled = f_medial_r_filled[:-max_nan_to_delete]
+            f_lateral_r_filled = f_lateral_r_filled[:-max_nan_to_delete]
+            f_total_r_filled = f_total_r_filled[:-max_nan_to_delete]
+            acc_x_r_filled = acc_x_r_filled[:-max_nan_to_delete]
+            acc_y_r_filled = acc_y_r_filled[:-max_nan_to_delete]
+            acc_z_r_filled = acc_z_r_filled[:-max_nan_to_delete]
+            gyro_x_r_filled = gyro_x_r_filled[:-max_nan_to_delete]
+            gyro_y_r_filled = gyro_y_r_filled[:-max_nan_to_delete]
+            gyro_z_r_filled = gyro_z_r_filled[:-max_nan_to_delete]
+
+            time_filled = time_filled[:-max_nan_to_delete]
+
+        # Convert the data to fill into dataframe
+        data_f_heel_l = pd.DataFrame(f_heel_l_filled)
+        data_f_medial_l = pd.DataFrame(f_medial_l_filled)
+        data_f_lateral_l = pd.DataFrame(f_lateral_l_filled)
+        data_f_total_l = pd.DataFrame(f_total_l_filled)
+        data_acc_x_l = pd.DataFrame(acc_x_l_filled)
+        data_acc_y_l = pd.DataFrame(acc_y_l_filled)
+        data_acc_z_l = pd.DataFrame(acc_z_l_filled)
+        data_gyro_x_l = pd.DataFrame(gyro_x_l_filled)
+        data_gyro_y_l = pd.DataFrame(gyro_y_l_filled)
+        data_gyro_z_l = pd.DataFrame(gyro_z_l_filled)
+
+        data_f_heel_r = pd.DataFrame(f_heel_r_filled)
+        data_f_medial_r = pd.DataFrame(f_medial_r_filled)
+        data_f_lateral_r = pd.DataFrame(f_lateral_r_filled)
+        data_f_total_r = pd.DataFrame(f_total_r_filled)
+        data_acc_x_r = pd.DataFrame(acc_x_r_filled)
+        data_acc_y_r = pd.DataFrame(acc_y_r_filled)
+        data_acc_z_r = pd.DataFrame(acc_z_r_filled)
+        data_gyro_x_r = pd.DataFrame(gyro_x_r_filled)
+        data_gyro_y_r = pd.DataFrame(gyro_y_r_filled)
+        data_gyro_z_r = pd.DataFrame(gyro_z_r_filled)
+
+        # Interpolate with the cubic method
+        data_f_heel_l_filled = data_f_heel_l.interpolate("cubic")
+        data_f_medial_l_filled = data_f_medial_l.interpolate("cubic")
+        data_f_lateral_l_filled = data_f_lateral_l.interpolate("cubic")
+        data_f_total_l_filled = data_f_total_l.interpolate("cubic")
+        data_acc_x_l_filled = data_acc_x_l.interpolate("cubic")
+        data_acc_y_l_filled = data_acc_y_l.interpolate("cubic")
+        data_acc_z_l_filled = data_acc_z_l.interpolate("cubic")
+        data_gyro_x_l_filled = data_gyro_x_l.interpolate("cubic")
+        data_gyro_y_l_filled = data_gyro_y_l.interpolate("cubic")
+        data_gyro_z_l_filled = data_gyro_z_l.interpolate("cubic")
+
+        data_f_heel_r_filled = data_f_heel_r.interpolate("cubic")
+        data_f_medial_r_filled = data_f_medial_r.interpolate("cubic")
+        data_f_lateral_r_filled = data_f_lateral_r.interpolate("cubic")
+        data_f_total_r_filled = data_f_total_r.interpolate("cubic")
+        data_acc_x_r_filled = data_acc_x_r.interpolate("cubic")
+        data_acc_y_r_filled = data_acc_y_r.interpolate("cubic")
+        data_acc_z_r_filled = data_acc_z_r.interpolate("cubic")
+        data_gyro_x_r_filled = data_gyro_x_r.interpolate("cubic")
+        data_gyro_y_r_filled = data_gyro_y_r.interpolate("cubic")
+        data_gyro_z_r_filled = data_gyro_z_r.interpolate("cubic")
+
+        # Convert the data interpolated into ndarray
+        data_f_heel_l_filled = np.reshape(
+            data_f_heel_l_filled.to_numpy(), (len(data_f_heel_l_filled),)
+        )
+        data_f_medial_l_filled = np.reshape(
+            data_f_medial_l_filled.to_numpy(), (len(data_f_medial_l_filled),)
+        )
+        data_f_lateral_l_filled = np.reshape(
+            data_f_lateral_l_filled.to_numpy(), (len(data_f_lateral_l_filled),)
+        )
+        data_f_total_l_filled = np.reshape(
+            data_f_total_l_filled.to_numpy(), (len(data_f_total_l_filled),)
+        )
+        data_acc_x_l_filled = np.reshape(
+            data_acc_x_l_filled.to_numpy(), (len(data_acc_x_l_filled),)
+        )
+        data_acc_y_l_filled = np.reshape(
+            data_acc_y_l_filled.to_numpy(), (len(data_acc_y_l_filled),)
+        )
+        data_acc_z_l_filled = np.reshape(
+            data_acc_z_l_filled.to_numpy(), (len(data_acc_z_l_filled),)
+        )
+        data_gyro_x_l_filled = np.reshape(
+            data_gyro_x_l_filled.to_numpy(), (len(data_gyro_x_l_filled),)
+        )
+        data_gyro_y_l_filled = np.reshape(
+            data_gyro_y_l_filled.to_numpy(), (len(data_gyro_y_l_filled),)
+        )
+        data_gyro_z_l_filled = np.reshape(
+            data_gyro_z_l_filled.to_numpy(), (len(data_gyro_z_l_filled),)
+        )
+
+        data_f_heel_r_filled = np.reshape(
+            data_f_heel_r_filled.to_numpy(), (len(data_f_heel_r_filled),)
+        )
+        data_f_medial_r_filled = np.reshape(
+            data_f_medial_r_filled.to_numpy(), (len(data_f_medial_r_filled),)
+        )
+        data_f_lateral_r_filled = np.reshape(
+            data_f_lateral_r_filled.to_numpy(), (len(data_f_lateral_r_filled),)
+        )
+        data_f_total_r_filled = np.reshape(
+            data_f_total_r_filled.to_numpy(), (len(data_f_total_r_filled),)
+        )
+        data_acc_x_r_filled = np.reshape(
+            data_acc_x_r_filled.to_numpy(), (len(data_acc_x_r_filled),)
+        )
+        data_acc_y_r_filled = np.reshape(
+            data_acc_y_r_filled.to_numpy(), (len(data_acc_y_r_filled),)
+        )
+        data_acc_z_r_filled = np.reshape(
+            data_acc_z_r_filled.to_numpy(), (len(data_acc_z_r_filled),)
+        )
+        data_gyro_x_r_filled = np.reshape(
+            data_gyro_x_r_filled.to_numpy(), (len(data_gyro_x_r_filled),)
+        )
+        data_gyro_y_r_filled = np.reshape(
+            data_gyro_y_r_filled.to_numpy(), (len(data_gyro_y_r_filled),)
+        )
+        data_gyro_z_r_filled = np.reshape(
+            data_gyro_z_r_filled.to_numpy(), (len(data_gyro_z_r_filled),)
+        )
+
+        # Fill the filled_data dictionnary
+        self.filled_data = {
+                    "time": time_filled,
+                    "f_heel_l": data_f_heel_l_filled,
+                    "f_medial_l": data_f_medial_l_filled,
+                    "f_lateral_l": data_f_lateral_l_filled,
+                    "f_total_l": data_f_total_l_filled,
+                    "acc_x_l": data_acc_x_l_filled,
+                    "acc_y_l": data_acc_y_l_filled,
+                    "acc_z_l": data_acc_z_l_filled,
+                    "gyro_x_l": data_gyro_x_l_filled,
+                    "gyro_y_l": data_gyro_y_l_filled,
+                    "gyro_z_l": data_gyro_z_l_filled,
+                    "f_heel_r": data_f_heel_l_filled,
+                    "f_medial_r": data_f_medial_l_filled,
+                    "f_lateral_r": data_f_lateral_l_filled,
+                    "f_total_r": data_f_total_l_filled,
+                    "acc_x_r": data_acc_x_l_filled,
+                    "acc_y_r": data_acc_y_l_filled,
+                    "acc_z_r": data_acc_z_l_filled,
+                    "gyro_x_r": data_gyro_x_l_filled,
+                    "gyro_y_r": data_gyro_y_l_filled,
+                    "gyro_z_r": data_gyro_z_l_filled
+                }
 
 
 
@@ -308,4 +534,15 @@ if __name__ == "__main__":
     plt.plot(test.cleaned_data["time_l"],test.cleaned_data["f_total_l"],label="total")
     plt.legend()
     plt.title("Cleaned force data of the left insole")
+    plt.figure()
+
+    # Fill missing data
+    test.fill_missing_data()
+    plt.plot(test.filled_data["time"],test.filled_data["f_heel_l"],label="heel")
+    plt.plot(test.filled_data["time"],test.filled_data["f_medial_l"],label="medial")
+    plt.plot(test.filled_data["time"],test.filled_data["f_lateral_l"],label="lateral")
+    plt.plot(test.filled_data["time"],test.filled_data["f_total_l"],label="total")
+    plt.legend()
+    plt.title("Filled force data of the left insole")
     plt.show()
+
