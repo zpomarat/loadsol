@@ -503,6 +503,11 @@ class DataLoadsol:
                 }
 
     def downsample(self,final_frequency:int):
+        """Downsamples data to the final frequency.
+
+        Args:
+            final_frequency (int): downsampled frequency 
+        """
 
         if self.filled_data is None:
             self.fill_missing_data()
@@ -523,6 +528,8 @@ class DataLoadsol:
 
         # Add new time vector downsampled
         self.downsampled_data["time"] = t_ds
+
+    
 
 
 
@@ -568,7 +575,7 @@ if __name__ == "__main__":
     plt.plot(test.filled_data["time"],test.filled_data["f_total_l"],label="total")
     plt.legend()
     plt.title("Filled force data of the left insole")
-    plt.show()
+    plt.figure()
 
     # Downsample data
     test.downsample(final_frequency=33)
