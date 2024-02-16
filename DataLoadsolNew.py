@@ -4,6 +4,8 @@ from os import getcwd
 from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
+from scipy.interpolate import interp1d
+from copy import deepcopy
 
 
 class DataLoadsol:
@@ -500,6 +502,28 @@ class DataLoadsol:
                     "gyro_z_r": data_gyro_z_l_filled
                 }
 
+    def downsample(self,final_frequency:int):
+
+        if self.filled_data is None:
+            self.fill_missing_data()
+
+        # Initialise downsampled data
+        self.downsampled_data = deepcopy(self.filled_data)
+
+        # Create new time vector based on the final frequency
+        t_ds = np.arange(self.filled_data["time"][0],self.filled_data["time"][-1],1/final_frequency)
+
+        for key in self.downsampled_data.keys():
+
+            # Create interpolation function
+            f = interp1d(self.filled_data["time"],self.filled_data.get(key))
+
+            # Downsample data
+            self.downsampled_data[key] = f(t_ds)
+
+        # Add new time vector downsampled
+        self.downsampled_data["time"] = t_ds
+
 
 
 
@@ -545,4 +569,13 @@ if __name__ == "__main__":
     plt.legend()
     plt.title("Filled force data of the left insole")
     plt.show()
+
+    # Downsample data
+    test.downsample(final_frequency=33)
+    plt.plot(test.filled_data["time"],test.filled_data["f_total_l"],'x',label="filled")   
+    plt.plot(test.downsampled_data["time"],test.downsampled_data["f_total_l"],'o',label="downsampled")
+    plt.legend()
+    plt.title("Dowsampled total force data of the left insole")
+    plt.show()
+
 
