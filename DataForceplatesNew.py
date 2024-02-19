@@ -4,6 +4,7 @@ from datetime import datetime
 import c3d
 import numpy as np
 from copy import deepcopy
+from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 
 class DataForceplates(Data.Data):
@@ -191,8 +192,33 @@ class DataForceplates(Data.Data):
             self.pre_processed_data["fy5"] = []
             self.pre_processed_data["fz5"] = []
                 
+    def downsample(self,final_frequency:int):
+        """Downsamples data to the final frequency.
 
+        Args:
+            final_frequency (int): downsampled frequency 
+        """
+
+        if self.pre_processed_data is None:
+            self.pre_process_data()
+
+        # Initialise downsampled data
+        self.downsampled_data = deepcopy(self.pre_processed_data)
+
+        # Create new time vector based on the final frequency
+        t_ds = np.arange(self.pre_processed_data["time"][0],self.pre_processed_data["time"][-1],1/final_frequency)
+
+        for key in self.downsampled_data.keys():
+
+            # Create interpolation function
+            if len(self.pre_processed_data.get(key)) != 0:
+                f = interp1d(self.pre_processed_data["time"],self.pre_processed_data.get(key))
             
+                # Downsample data
+                self.downsampled_data[key] = f(t_ds)
+
+        # Add new time vector downsampled
+        self.downsampled_data["time"] = t_ds 
 
 
 if __name__ == "__main__":
@@ -200,6 +226,7 @@ if __name__ == "__main__":
 
     test = DataForceplates(curr_path + "\\tests_09_02_24\\data\\poussee_5_L.c3d", frequency=1000)
 
+    # Raw data
     test.c3d_reader_forceplates()
     plt.plot(test.raw_data['time'],test.raw_data['fx1'],label='fx1')
     plt.plot(test.raw_data['time'],test.raw_data['fy1'],label='fy1')
@@ -211,6 +238,7 @@ if __name__ == "__main__":
     plt.title("Raw data")
     plt.figure()
 
+    # Pre-processed data: orientation changed and zero set
     test.pre_process_data()
     plt.plot(test.pre_processed_data['time'],test.pre_processed_data['fx1'],label='fx1')
     plt.plot(test.pre_processed_data['time'],test.pre_processed_data['fy1'],label='fy1')
@@ -220,5 +248,13 @@ if __name__ == "__main__":
     plt.plot(test.pre_processed_data['time'],test.pre_processed_data['fz2'],label='fz2')
     plt.legend()
     plt.title("Pre-processed data")
+    plt.figure()
+
+    # Downsample data
+    test.downsample(final_frequency=200)
+    plt.plot(test.pre_processed_data["time"],test.pre_processed_data["fx1"],'-x',label="filled")   
+    plt.plot(test.downsampled_data["time"],test.downsampled_data["fx1"],'-o',label="downsampled")
+    plt.legend()
+    plt.title("Dowsampled fx1")
     plt.show()
 
