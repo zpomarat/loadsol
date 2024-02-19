@@ -6,18 +6,18 @@ from DataForceplatesNew import DataForceplates
 class TrialAnalysis:
     def __init__(
         self,
-        DataForceplate: DataForceplates,
-        DataLoadSol: DataLoadsol
+        DataLoadSol: DataLoadsol,
+        DataForceplate: DataForceplates        
     ):
-        self.DataLoadsol = deepcopy(DataLoadSol)
-        self.DataForceplate = deepcopy(DataForceplate)
-        self.DataLoadsol_sync = None
-        self.DataForceplates_sync = None
+        self.data_loadsol = deepcopy(DataLoadSol)
+        self.data_forceplate = deepcopy(DataForceplate)
+        self.data_loadsol_sync = None
+        self.data_forceplate_sync = None
 
         if DataLoadSol is not None:
-            self.DataLoadsol.downsample(final_frequency=200)
+            self.data_loadsol.downsample(final_frequency=200)
         if DataForceplates is not None:
-            self.DataForceplate.downsample(final_frequency=200)
+            self.data_forceplate.downsample(final_frequency=200)
 
 
 
@@ -38,3 +38,4 @@ if __name__ == "__main__":
         DataLoadSol=poussee_1_L_ls,
         DataForceplate=poussee_1_L_fp
     )
+
