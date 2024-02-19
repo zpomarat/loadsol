@@ -1,4 +1,3 @@
-import Data
 from os import getcwd
 from datetime import datetime
 import c3d
@@ -7,9 +6,8 @@ from copy import deepcopy
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 
-class DataForceplates(Data.Data):
+class DataForceplates:
     def __init__(self, path: str, frequency:int):
-        super().__init__(path, frequency)
         self.path = path
         self.file_name = (self.path.split("\\"))[-1].split(".")[0]
         self.frequency = frequency
