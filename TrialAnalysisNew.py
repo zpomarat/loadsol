@@ -14,6 +14,9 @@ class TrialAnalysis:
         sync_index_loadsol: int,
         sync_index_forceplates: int,
         final_frequency: int,
+        data_state = "raw",
+        order = 4,
+        fcut = 20
     ):
         self.data_loadsol = deepcopy(DataLoadSol)
         self.data_forceplates = deepcopy(DataForcePlates)
@@ -22,13 +25,23 @@ class TrialAnalysis:
 
         ## Synchronise manually signals
         # Initialise synchronised data
-        if DataLoadSol is not None:
-            self.data_loadsol.downsample(final_frequency)
-        if DataForcePlates is not None:
-            self.data_forceplates.downsample(final_frequency)
+        if data_state is "raw":
+            if DataLoadSol is not None:
+                self.data_loadsol.downsample(final_frequency)
+            if DataForcePlates is not None:
+                self.data_forceplates.downsample(final_frequency)
 
-        self.data_loadsol_sync = deepcopy(self.data_loadsol.downsampled_data)
-        self.data_forceplates_sync = deepcopy(self.data_forceplates.downsampled_data)
+            self.data_loadsol_sync = deepcopy(self.data_loadsol.downsampled_data)
+            self.data_forceplates_sync = deepcopy(self.data_forceplates.downsampled_data)
+
+        elif data_state is "filtered":
+            if DataLoadSol is not None:
+                self.data_loadsol.filter(fs = final_frequency, order = order, fcut = fcut)
+            if DataForcePlates is not None:
+                self.data_forceplates.filter(fs = final_frequency, order = order, fcut = fcut)
+
+            self.data_loadsol_sync = deepcopy(self.data_loadsol.filtered_data)
+            self.data_forceplates_sync = deepcopy(self.data_forceplates.filtered_data)
 
         # Start signals at the start index
         for key_ls in self.data_loadsol_sync.keys():
@@ -93,6 +106,37 @@ class TrialAnalysis:
         # Export data to a csv file
         df.to_csv(export_directory + file_name + "_processed.csv")
 
+    def compare_loadsol_forceplates(self):
+        fig1, axs = plt.subplots(2)
+        fig1.suptitle("Comparison FP / LS")
+        axs[0].set_title("Left insole")
+        axs[0].plot(self.time_ls, self.l_f_heel, label="heel")
+        axs[0].plot(self.time_ls, self.l_f_medial, label="medial")
+        axs[0].plot(self.time_ls, self.l_f_lateral, label="lateral")
+        axs[0].plot(self.time_ls, self.l_f_total, label="total")
+        axs[0].plot(self.time_fp, self.fp1_x, "-.", label="Fx")
+        axs[0].plot(self.time_fp, self.fp1_y, "-.", label="Fy")
+        axs[0].plot(self.time_fp, self.fp1_z, "-.", label="Fz")
+
+        axs[1].set_title("Right insole")
+        axs[1].plot(self.time_ls, self.r_f_heel, label="heel")
+        axs[1].plot(self.time_ls, self.r_f_medial, label="medial")
+        axs[1].plot(self.time_ls, self.r_f_lateral, label="lateral")
+        axs[1].plot(self.time_ls, self.r_f_total, label="total")
+        axs[1].plot(self.time_fp, self.fp2_x, "-.", label="Fx")
+        axs[1].plot(self.time_fp, self.fp2_y, "-.", label="Fy")
+        axs[1].plot(self.time_fp, self.fp2_z, "-.", label="Fz")
+
+        axs[0].set_xlabel("Time (s)")
+        axs[0].set_ylabel("Force (N)")
+        axs[1].set_xlabel("Time (s)")
+        axs[1].set_ylabel("Force (N)")
+
+        axs[0].legend()
+        axs[1].legend()
+        fig1.subplots_adjust(hspace=0.3)
+        plt.show()
+
 
 if __name__ == "__main__":
     curr_path = getcwd()
@@ -123,10 +167,10 @@ if __name__ == "__main__":
         )
 
         Trial = TrialAnalysis(
-            DataLoadSol=data_ls, DataForcePlates=data_fp, final_frequency=200, sync_index_loadsol=idx_ls, sync_index_forceplates=int(idx_fp/5)
+            DataLoadSol=data_ls, DataForcePlates=data_fp, final_frequency=200, sync_index_loadsol=idx_ls, sync_index_forceplates=int(idx_fp/5), data_state = "filtered"
         )
 
-        Trial.export_csv(export_directory=curr_path + "\\tests_09_02_24\\results\\",file_name=file_name)
+        Trial.export_csv(export_directory=curr_path + "\\tests_09_02_24\\results\\filtered\\",file_name=file_name)
 
     #     # Initialise data (synchronised + downsampled signals)
     #     plt.plot(Trial.data_loadsol_sync["time"],Trial.data_loadsol_sync['f_total_l'],"-o",label="f total left")
