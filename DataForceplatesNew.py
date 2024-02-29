@@ -5,6 +5,7 @@ import numpy as np
 from copy import deepcopy
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
+from scipy import signal
 
 class DataForceplates:
     def __init__(self, path: str, frequency:int):
@@ -200,6 +201,8 @@ class DataForceplates:
         if self.pre_processed_data is None:
             self.pre_process_data()
 
+        self.final_frequency = final_frequency
+
         # Initialise downsampled data
         self.downsampled_data = deepcopy(self.pre_processed_data)
 
@@ -217,6 +220,56 @@ class DataForceplates:
 
         # Add new time vector downsampled
         self.downsampled_data["time"] = t_ds 
+
+    def filter(
+        self,
+        order: int,
+        fcut: int
+        ):
+        """Apply a butterworth filter with a backward & forward pass.
+
+        Args:
+            order (int): order of the filter. Note that with the backward & forward pass, this order will be multiplied by 2.
+            fcut (int): Must be smaller than the half of the sampling frequency.
+        """
+
+        if self.downsampled_data is None:
+            self.downsample()
+
+        # Initialise downsampled data
+        self.filtered_data = deepcopy(self.downsampled_data)
+
+        Wn = fcut / (self.final_frequency/2)
+
+        b, a = signal.butter(order, Wn, analog=False)
+
+        # Filter data
+        self.filtered_data["fx1"] = signal.filtfilt(b, a, self.filtered_data["fx1"])
+        self.filtered_data["fy1"] = signal.filtfilt(b, a, self.filtered_data["fy1"])
+        self.filtered_data["fz1"] = signal.filtfilt(b, a, self.filtered_data["fz1"])
+
+        self.filtered_data["fx2"] = signal.filtfilt(b, a, self.filtered_data["fx2"])
+        self.filtered_data["fy2"] = signal.filtfilt(b, a, self.filtered_data["fy2"])
+        self.filtered_data["fz2"] = signal.filtfilt(b, a, self.filtered_data["fz2"])
+
+        self.filtered_data["fx3"] = signal.filtfilt(b, a, self.filtered_data["fx3"])
+        self.filtered_data["fy3"] = signal.filtfilt(b, a, self.filtered_data["fy3"])
+        self.filtered_data["fz3"] = signal.filtfilt(b, a, self.filtered_data["fz3"])
+
+        self.filtered_data["fx4"] = signal.filtfilt(b, a, self.filtered_data["fx4"])
+        self.filtered_data["fy4"] = signal.filtfilt(b, a, self.filtered_data["fy4"])
+        self.filtered_data["fz4"] = signal.filtfilt(b, a, self.filtered_data["fz4"])
+
+        try:
+            self.filtered_data["fx5"] = signal.filtfilt(b, a, self.filtered_data["fx5"])
+            self.filtered_data["fy5"] = signal.filtfilt(b, a, self.filtered_data["fy5"])
+            self.filtered_data["fz5"] = signal.filtfilt(b, a, self.filtered_data["fz5"])
+
+        except:
+            self.filtered_data["fx5"] = []
+            self.filtered_data["fy5"] = []
+            self.filtered_data["fz5"] = []
+
 
 
 if __name__ == "__main__":
@@ -254,5 +307,22 @@ if __name__ == "__main__":
     plt.plot(test.downsampled_data["time"],test.downsampled_data["fx1"],'-o',label="downsampled")
     plt.legend()
     plt.title("Dowsampled fx1")
-    plt.show()
+    plt.figure()
 
+    # Filtered data
+    test.filter(order=4,fcut = 20)
+    plt.plot(test.downsampled_data["time"],test.downsampled_data["fx1"],label="downsampled fx1")   
+    plt.plot(test.filtered_data["time"],test.filtered_data["fx1"],label="filtered fx1")
+    plt.plot(test.downsampled_data["time"],test.downsampled_data["fy1"],label="downsampled fy1")   
+    plt.plot(test.filtered_data["time"],test.filtered_data["fy1"],label="filtered fy1")
+    plt.plot(test.downsampled_data["time"],test.downsampled_data["fz1"],label="downsampled fz1")   
+    plt.plot(test.filtered_data["time"],test.filtered_data["fz1"],label="filtered fz1")
+    plt.plot(test.downsampled_data["time"],test.downsampled_data["fx2"],label="downsampled fx2")   
+    plt.plot(test.filtered_data["time"],test.filtered_data["fx2"],label="filtered fx2")
+    plt.plot(test.downsampled_data["time"],test.downsampled_data["fy2"],label="downsampled fy2")   
+    plt.plot(test.filtered_data["time"],test.filtered_data["fy2"],label="filtered fy2")
+    plt.plot(test.downsampled_data["time"],test.downsampled_data["fz2"],label="downsampled fz2")   
+    plt.plot(test.filtered_data["time"],test.filtered_data["fz2"],label="filtered fz2")
+    plt.legend()
+    plt.title("Filtered data")
+    plt.show()
