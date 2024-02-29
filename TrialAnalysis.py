@@ -357,38 +357,38 @@ class TrialAnalysis:
                     forceplate_number=2,
                 )[:, 2]
 
-            # Cut signals to the dimension of the smallest one
-            min_len = min(len(self.l_f_heel), len(self.fp1_x))
+        # Cut signals to the dimension of the smallest one
+        min_len = min(len(self.l_f_heel), len(self.fp1_x))
 
-            self.l_f_heel = self.l_f_heel[:min_len]
-            self.l_f_medial = self.l_f_medial[:min_len]
-            self.l_f_lateral = self.l_f_lateral[:min_len]
-            self.l_f_total = self.l_f_total[:min_len]
-            self.l_accx = self.l_accx[:min_len]
-            self.l_accy = self.l_accy[:min_len]
-            self.l_accz = self.l_accz[:min_len]
-            self.l_gyrox = self.l_gyrox[:min_len]
-            self.l_gyroy = self.l_gyroy[:min_len]
-            self.l_gyroz = self.l_gyroz[:min_len]
-            self.r_f_heel = self.r_f_heel[:min_len]
-            self.r_f_medial = self.r_f_medial[:min_len]
-            self.r_f_lateral = self.r_f_lateral[:min_len]
-            self.r_f_total = self.r_f_total[:min_len]
-            self.r_accx = self.r_accx[:min_len]
-            self.r_accy = self.r_accy[:min_len]
-            self.r_accz = self.r_accz[:min_len]
-            self.r_gyrox = self.r_gyrox[:min_len]
-            self.r_gyroy = self.r_gyroy[:min_len]
-            self.r_gyroz = self.r_gyroz[:min_len]
-            self.fp1_x = self.fp1_x[:min_len]
-            self.fp1_y = self.fp1_y[:min_len]
-            self.fp1_z = self.fp1_z[:min_len]
-            self.fp2_x = self.fp2_x[:min_len]
-            self.fp2_y = self.fp2_y[:min_len]
-            self.fp2_z = self.fp2_z[:min_len]
+        self.l_f_heel = self.l_f_heel[:min_len]
+        self.l_f_medial = self.l_f_medial[:min_len]
+        self.l_f_lateral = self.l_f_lateral[:min_len]
+        self.l_f_total = self.l_f_total[:min_len]
+        self.l_accx = self.l_accx[:min_len]
+        self.l_accy = self.l_accy[:min_len]
+        self.l_accz = self.l_accz[:min_len]
+        self.l_gyrox = self.l_gyrox[:min_len]
+        self.l_gyroy = self.l_gyroy[:min_len]
+        self.l_gyroz = self.l_gyroz[:min_len]
+        self.r_f_heel = self.r_f_heel[:min_len]
+        self.r_f_medial = self.r_f_medial[:min_len]
+        self.r_f_lateral = self.r_f_lateral[:min_len]
+        self.r_f_total = self.r_f_total[:min_len]
+        self.r_accx = self.r_accx[:min_len]
+        self.r_accy = self.r_accy[:min_len]
+        self.r_accz = self.r_accz[:min_len]
+        self.r_gyrox = self.r_gyrox[:min_len]
+        self.r_gyroy = self.r_gyroy[:min_len]
+        self.r_gyroz = self.r_gyroz[:min_len]
+        self.fp1_x = self.fp1_x[:min_len]
+        self.fp1_y = self.fp1_y[:min_len]
+        self.fp1_z = self.fp1_z[:min_len]
+        self.fp2_x = self.fp2_x[:min_len]
+        self.fp2_y = self.fp2_y[:min_len]
+        self.fp2_z = self.fp2_z[:min_len]
 
-            self.time_ls = self.time_ls[:min_len]
-            self.time_fp = self.time_fp[:min_len]
+        self.time_ls = self.time_ls[:min_len]
+        self.time_fp = self.time_fp[:min_len]
 
     def compare_loadsol_forceplates(self):
         fig1, axs = plt.subplots(2)
@@ -646,14 +646,15 @@ class TrialAnalysis:
 
 if __name__ == "__main__":
     curr_path = getcwd()
-    working_directory = curr_path + "\\examples\\data\\"
+    # working_directory = curr_path + "\\examples\\data\\"
+    working_directory = curr_path + "\\tests_09_02_24\\data\\"
 
-    file_name = "test_poussee_2"
-    poussee_2_ls = DataLoadsol(
+    file_name = "poussee_1_L"
+    poussee_1_L_ls = DataLoadsol(
         path=working_directory + file_name + ".txt", frequency=200
     )
 
-    poussee_2_fp = DataForceplates(
+    poussee_1_L_fp = DataForceplates(
         path=working_directory + file_name + ".c3d", frequency=1000
     )
 
@@ -692,12 +693,12 @@ if __name__ == "__main__":
     #     sync_time_forceplate=int(13718 / 5),
     # )
 
-    Trial = TrialAnalysis(
-        poussee_2_fp,
-        poussee_2_ls,
-        sync_time_loadsol=3165,
-        sync_time_forceplate=int(15384 / 5),
-    )
+    # Trial = TrialAnalysis(
+    #     poussee_2_fp,
+    #     poussee_2_ls,
+    #     sync_time_loadsol=3165,
+    #     sync_time_forceplate=int(15384 / 5),
+    # )
 
     # Trial = TrialAnalysis(
     #     poussee_3_fp,
@@ -719,6 +720,14 @@ if __name__ == "__main__":
     #     sync_time_loadsol=0,
     #     sync_time_forceplate=0,
     # )
+
+    Trial = TrialAnalysis(
+        DataForceplate=poussee_1_L_fp,
+        DataLoadSol=poussee_1_L_ls,
+        sync_time_loadsol=2349,
+        sync_time_forceplate=12092,
+    )
+
 
     Trial.compare_loadsol_forceplates()
     # Trial.plot_ls_forces()
