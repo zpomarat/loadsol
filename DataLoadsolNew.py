@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.interpolate import interp1d
 from copy import deepcopy
+from scipy import signal
 
 
 class DataLoadsol:
@@ -19,6 +20,7 @@ class DataLoadsol:
         self.cleaned_data = None
         self.filled_data = None
         self.resampled_data = None
+        self.final_frequency = None
         self.filtered_data = None
 
     def convert_txt_to_csv(self, output_directory: str):
@@ -512,6 +514,8 @@ class DataLoadsol:
         if self.filled_data is None:
             self.fill_missing_data()
 
+        self.final_frequency = final_frequency
+
         # Initialise downsampled data
         self.downsampled_data = deepcopy(self.filled_data)
 
@@ -528,8 +532,53 @@ class DataLoadsol:
 
         # Add new time vector downsampled
         self.downsampled_data["time"] = t_ds
+        
 
     
+    def filter(
+        self,
+        order: int,
+        fcut: int
+        ):
+        """Apply a butterworth filter with a backward & forward pass.
+
+        Args:
+            order (int): order of the filter. Note that with the backward & forward pass, this order will be multiplied by 2.
+            cutoff_frequency (float): Frequency where the gain drops to 1/sqrt(2) that of the passband (the -3dB point).
+        """
+
+        if self.downsampled_data is None:
+            self.downsample()
+
+        # Initialise downsampled data
+        self.filtered_data = deepcopy(self.downsampled_data)
+
+        Wn = fcut / (self.final_frequency/2)
+
+        b, a = signal.butter(order, Wn, analog=False)
+
+        # Filter data
+        self.filtered_data["f_heel_l"] = signal.filtfilt(b, a, self.filtered_data["f_heel_l"])
+        self.filtered_data["f_medial_l"] = signal.filtfilt(b, a, self.filtered_data["f_medial_l"])
+        self.filtered_data["f_lateral_l"] = signal.filtfilt(b, a, self.filtered_data["f_lateral_l"])
+        self.filtered_data["f_total_l"] = signal.filtfilt(b, a, self.filtered_data["f_total_l"])
+        self.filtered_data["acc_x_l"] = signal.filtfilt(b, a, self.filtered_data["acc_x_l"])
+        self.filtered_data["acc_y_l"] = signal.filtfilt(b, a, self.filtered_data["acc_y_l"])
+        self.filtered_data["acc_z_l"] = signal.filtfilt(b, a, self.filtered_data["acc_z_l"])
+        self.filtered_data["gyro_x_l"] = signal.filtfilt(b, a, self.filtered_data["gyro_x_l"])
+        self.filtered_data["gyro_y_l"] = signal.filtfilt(b, a, self.filtered_data["gyro_y_l"])
+        self.filtered_data["gyro_z_l"] = signal.filtfilt(b, a, self.filtered_data["gyro_z_l"])
+
+        self.filtered_data["f_heel_r"] = signal.filtfilt(b, a, self.filtered_data["f_heel_r"])
+        self.filtered_data["f_medial_r"] = signal.filtfilt(b, a, self.filtered_data["f_medial_r"])
+        self.filtered_data["f_lateral_r"] = signal.filtfilt(b, a, self.filtered_data["f_lateral_r"])
+        self.filtered_data["f_total_r"] = signal.filtfilt(b, a, self.filtered_data["f_total_r"])
+        self.filtered_data["acc_x_r"] = signal.filtfilt(b, a, self.filtered_data["acc_x_r"])
+        self.filtered_data["acc_y_r"] = signal.filtfilt(b, a, self.filtered_data["acc_y_r"])
+        self.filtered_data["acc_z_r"] = signal.filtfilt(b, a, self.filtered_data["acc_z_r"])
+        self.filtered_data["gyro_x_r"] = signal.filtfilt(b, a, self.filtered_data["gyro_x_r"])
+        self.filtered_data["gyro_y_r"] = signal.filtfilt(b, a, self.filtered_data["gyro_y_r"])
+        self.filtered_data["gyro_z_r"] = signal.filtfilt(b, a, self.filtered_data["gyro_z_r"])
 
 
 
@@ -578,11 +627,23 @@ if __name__ == "__main__":
     plt.figure()
 
     # Downsample data
-    test.downsample(final_frequency=33)
+    test.downsample(final_frequency=200)
     plt.plot(test.filled_data["time"],test.filled_data["f_total_l"],'x',label="filled")   
     plt.plot(test.downsampled_data["time"],test.downsampled_data["f_total_l"],'o',label="downsampled")
     plt.legend()
     plt.title("Dowsampled total force data of the left insole")
+    plt.figure()
+
+    # Filtered data
+    test.filter(order=4,fcut = 25)
+    plt.plot(test.downsampled_data["time"],test.downsampled_data["f_total_l"],label="downsampled f_total_l")   
+    plt.plot(test.filtered_data["time"],test.filtered_data["f_total_l"],label="filtered f_total_l")
+    plt.plot(test.downsampled_data["time"],test.downsampled_data["acc_x_l"]*100,label="downsampled acc_x_l")   
+    plt.plot(test.filtered_data["time"],test.filtered_data["acc_x_l"]*100,label="filtered acc_x_l")
+    plt.plot(test.downsampled_data["time"],test.downsampled_data["gyro_x_l"]*100,label="downsampled gyro_x_l")   
+    plt.plot(test.filtered_data["time"],test.filtered_data["gyro_x_l"]*100,label="filtered gyro_x_l")
+    plt.legend()
+    plt.title("Filtered data")
     plt.show()
 
 
