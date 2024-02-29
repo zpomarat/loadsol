@@ -15,7 +15,7 @@ class DataForceplates:
         self.raw_data = None
         self.timestamp = None
         self.pre_processed_data = None
-        self.resampled_data = None
+        self.downsampled_data = None
         self.filtered_data = None
 
     def c3d_reader_forceplates(self):
@@ -223,18 +223,20 @@ class DataForceplates:
 
     def filter(
         self,
+        fs: int,
         order: int,
         fcut: int
         ):
         """Apply a butterworth filter with a backward & forward pass.
 
         Args:
+            fs: sampling frequency of the signal.
             order (int): order of the filter. Note that with the backward & forward pass, this order will be multiplied by 2.
             fcut (int): Must be smaller than the half of the sampling frequency.
         """
 
         if self.downsampled_data is None:
-            self.downsample()
+            self.downsample(fs)
 
         # Initialise downsampled data
         self.filtered_data = deepcopy(self.downsampled_data)

@@ -19,7 +19,7 @@ class DataLoadsol:
         self.timestamp = None
         self.cleaned_data = None
         self.filled_data = None
-        self.resampled_data = None
+        self.downsampled_data = None
         self.final_frequency = None
         self.filtered_data = None
 
@@ -532,23 +532,23 @@ class DataLoadsol:
 
         # Add new time vector downsampled
         self.downsampled_data["time"] = t_ds
-        
 
-    
     def filter(
         self,
+        fs: int,
         order: int,
         fcut: int
         ):
         """Apply a butterworth filter with a backward & forward pass.
 
         Args:
+            fs: sampling frequency of the signal.
             order (int): order of the filter. Note that with the backward & forward pass, this order will be multiplied by 2.
-            cutoff_frequency (float): Frequency where the gain drops to 1/sqrt(2) that of the passband (the -3dB point).
+            fcut (int): Must be smaller than the half of the sampling frequency.
         """
 
         if self.downsampled_data is None:
-            self.downsample()
+            self.downsample(fs)
 
         # Initialise downsampled data
         self.filtered_data = deepcopy(self.downsampled_data)
@@ -635,7 +635,7 @@ if __name__ == "__main__":
     plt.figure()
 
     # Filtered data
-    test.filter(order=4,fcut = 25)
+    test.filter(order=4,fcut = 20)
     plt.plot(test.downsampled_data["time"],test.downsampled_data["f_total_l"],label="downsampled f_total_l")   
     plt.plot(test.filtered_data["time"],test.filtered_data["f_total_l"],label="filtered f_total_l")
     plt.plot(test.downsampled_data["time"],test.downsampled_data["acc_x_l"]*100,label="downsampled acc_x_l")   
