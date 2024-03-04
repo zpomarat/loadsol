@@ -4,6 +4,7 @@ from DataLoadsolNew import DataLoadsol
 from DataForceplatesNew import DataForceplates
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
 
 class TrialAnalysis:
@@ -211,13 +212,13 @@ class TrialAnalysis:
 
         axs[2].set_title("Gyrometer")
         if self.data_state == "pre_processed":
-            axs[2].plot(self.data_loadsol.downsampled_data["time"], self.data_loadsol.downsampled_data["gyro_x_r"], label="gyro x")
-            axs[2].plot(self.data_loadsol.downsampled_data["time"], self.data_loadsol.downsampled_data["gyro_y_r"], label="gyro y")
-            axs[2].plot(self.data_loadsol.downsampled_data["time"], self.data_loadsol.downsampled_data["gyro_z_r"], label="gyro z")
+            axs[2].plot(self.data_loadsol.downsampled_data["time"], self.data_loadsol.downsampled_data["gyro_x_"], label="gyro x")
+            axs[2].plot(self.data_loadsol.downsampled_data["time"], self.data_loadsol.downsampled_data["gyro_y_"], label="gyro y")
+            axs[2].plot(self.data_loadsol.downsampled_data["time"], self.data_loadsol.downsampled_data["gyro_z_"], label="gyro z")
         elif self.data_state == "filtered":
-            axs[2].plot(self.data_loadsol.filtered_data["time"], self.data_loadsol.filtered_data["gyro_x_r"], label="gyro x")
-            axs[2].plot(self.data_loadsol.filtered_data["time"], self.data_loadsol.filtered_data["gyro_y_r"], label="gyro y")
-            axs[2].plot(self.data_loadsol.filtered_data["time"], self.data_loadsol.filtered_data["gyro_z_r"], label="gyro z")
+            axs[2].plot(self.data_loadsol.filtered_data["time"], self.data_loadsol.filtered_data["gyro_x_"], label="gyro x")
+            axs[2].plot(self.data_loadsol.filtered_data["time"], self.data_loadsol.filtered_data["gyro_y_"], label="gyro y")
+            axs[2].plot(self.data_loadsol.filtered_data["time"], self.data_loadsol.filtered_data["gyro_z_"], label="gyro z")
 
         axs[0].set_xlabel("Time (s)")
         axs[0].set_ylabel("Force (N)")
@@ -231,6 +232,18 @@ class TrialAnalysis:
         axs[2].legend()
         fig2.subplots_adjust(hspace=0.3)
         plt.show()
+
+    def plot(self,time:np.ndarray, data:np.ndarray, data_type:str, legend:str):
+        plt.plot(time,data,label=legend)
+        plt.xlabel("Time (s)")
+        if data_type == "force":
+            plt.ylabel("Force (N)")
+        elif data_type == "accelerometer":
+            plt.ylabel("Acceleration (g)")
+        elif data_type == "gyroscope":
+            plt.ylabel("Angular velocity (rad/s)")
+        plt.legend()
+
 
 
 if __name__ == "__main__":
@@ -267,8 +280,13 @@ if __name__ == "__main__":
 
         Trial.export_csv(export_directory=curr_path + "\\tests_09_02_24\\results\\filtered\\",file_name=file_name)
 
-        Trial.compare_loadsol_forceplates()
-        Trial.compare_forces_imu()
+        # Trial.compare_loadsol_forceplates()
+        # Trial.compare_forces_imu()
+
+        Trial.plot(time=Trial.data_loadsol_sync["time"],data=Trial.data_loadsol_sync["f_total_l"],data_type="force",legend="f total left")
+        Trial.plot(time=Trial.data_forceplates_sync["time"],data=Trial.data_forceplates_sync["fy1"],data_type="force",legend="fy")
+        plt.title("Comparison Fy and ftot (loadsol) for the left foot.")
+        plt.show()
 
     #     # Initialise data (synchronised + downsampled signals)
     #     plt.plot(Trial.data_loadsol_sync["time"],Trial.data_loadsol_sync['f_total_l'],"-o",label="f total left")
