@@ -12,8 +12,8 @@ from scipy import signal
 class DataLoadsol:
     def __init__(self, path: str, frequency: int):
         self.path = path
-        self.path_csv = self.path[:-3] + "csv"
         self.file_name = (self.path.split("\\"))[-1].split(".")[0]
+        self.path_csv = self.path.split('txt')[0] + 'csv\\' + self.file_name + ".csv"
         self.frequency = frequency
         self.raw_data = None
         self.timestamp = None

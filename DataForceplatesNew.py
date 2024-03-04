@@ -11,6 +11,9 @@ class DataForceplates:
     def __init__(self, path: str, frequency:int):
         self.path = path
         self.file_name = (self.path.split("\\"))[-1].split(".")[0]
+        self.path_c3d = self.path.split('txt')[0] + 'c3d\\' + self.file_name + ".c3d"
+        self.path_xcp = self.path.split('txt')[0] + 'xcp\\' + self.file_name + ".xcp"
+        self.file_name = (self.path.split("\\"))[-1].split(".")[0]
         self.frequency = frequency
         self.raw_data = None
         self.timestamp = None
@@ -27,7 +30,7 @@ class DataForceplates:
         file_path = self.path[:-3] + "xcp"
 
         # Read the line line containing the timestamp in the text file
-        with open(file_path) as file:
+        with open(self.path_xcp) as file:
             lines = file.readlines()
 
         # Line containing the timestamp
@@ -47,7 +50,7 @@ class DataForceplates:
         self.timestamp = timestamp
 
         ## Read the c3d file
-        reader = c3d.Reader(open(self.path,'rb'))
+        reader = c3d.Reader(open(self.path_c3d,'rb'))
 
         # Extract analog data (raw data + others parameters)
         data_analog = []
