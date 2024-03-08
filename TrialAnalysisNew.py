@@ -366,41 +366,111 @@ class TrialAnalysis:
             plt.ylabel("Angular velocity (rad/s)")
         plt.legend()
 
-    def normalize(self, weight: float):
+    def normalize(self, factor: float):
 
         # Initialize data
-        f_heel_l_weight_normalized = self.data_loadsol_sync["f_heel_l"]
-        f_medial_l_weight_normalized = self.data_loadsol_sync["f_medial_l"]
-        f_lateral_l_weight_normalized = self.data_loadsol_sync["f_lateral_l"]
-        f_total_l_weight_normalized = self.data_loadsol_sync["f_total_l"]
+        f_heel_l_normalized = self.data_loadsol_sync["f_heel_l"]
+        f_medial_l_normalized = self.data_loadsol_sync["f_medial_l"]
+        f_lateral_l_normalized = self.data_loadsol_sync["f_lateral_l"]
+        f_total_l_normalized = self.data_loadsol_sync["f_total_l"]
 
-        f_heel_r_weight_normalized = self.data_loadsol_sync["f_heel_r"]
-        f_medial_r_weight_normalized = self.data_loadsol_sync["f_medial_r"]
-        f_lateral_r_weight_normalized = self.data_loadsol_sync["f_lateral_r"]
-        f_total_r_weight_normalized = self.data_loadsol_sync["f_total_r"]
+        f_heel_r_normalized = self.data_loadsol_sync["f_heel_r"]
+        f_medial_r_normalized = self.data_loadsol_sync["f_medial_r"]
+        f_lateral_r_normalized = self.data_loadsol_sync["f_lateral_r"]
+        f_total_r_normalized = self.data_loadsol_sync["f_total_r"]
 
         # Divide data by half of the weight
-        f_heel_l_weight_normalized /= weight / 2
-        f_medial_l_weight_normalized /= weight / 2
-        f_lateral_l_weight_normalized /= weight / 2
-        f_total_l_weight_normalized /= weight / 2
+        f_heel_l_normalized /= factor
+        f_medial_l_normalized /= factor
+        f_lateral_l_normalized /= factor
+        f_total_l_normalized /= factor
 
-        f_heel_r_weight_normalized /= weight / 2
-        f_medial_r_weight_normalized /= weight / 2
-        f_lateral_r_weight_normalized /= weight / 2
-        f_total_r_weight_normalized /= weight / 2
+        f_heel_r_normalized /= factor
+        f_medial_r_normalized /= factor
+        f_lateral_r_normalized /= factor
+        f_total_r_normalized /= factor
 
         # Fill the weight_normalized_data dictionnary
         self.weight_normalized_data = {
-            "f_heel_l": f_heel_l_weight_normalized,
-            "f_medial_l": f_medial_l_weight_normalized,
-            "f_lateral_l": f_lateral_l_weight_normalized,
-            "f_total_l": f_total_l_weight_normalized,
-            "f_heel_r": f_heel_r_weight_normalized,
-            "f_medial_r": f_medial_r_weight_normalized,
-            "f_lateral_r": f_lateral_r_weight_normalized,
-            "f_total_r": f_total_r_weight_normalized,
+            "f_heel_l": f_heel_l_normalized,
+            "f_medial_l": f_medial_l_normalized,
+            "f_lateral_l": f_lateral_l_normalized,
+            "f_total_l": f_total_l_normalized,
+            "f_heel_r": f_heel_r_normalized,
+            "f_medial_r": f_medial_r_normalized,
+            "f_lateral_r": f_lateral_r_normalized,
+            "f_total_r": f_total_r_normalized,
         }
+
+    def define_initialization_phase(self,side:str, interv:int, start:int, data:np.ndarray):
+
+            # Select signal
+            if side == "left":
+                ftot = self.data_loadsol_sync["f_total_l"]
+            elif side == "right":
+                ftot = self.data_loadsol_sync["f_total_r"]
+            elif side == "total":
+                ftot = data
+
+            # Select interval size
+            INTERV = interv #200
+
+            # Define start
+            START = start #500
+
+            for idx, val in enumerate(ftot[START:]):
+                # Initialize ending condition
+                condition_verified = False
+
+                # Define interval to evaluate
+                eval = ftot[START+idx:START+idx+ INTERV]
+
+                # Indexes and values of the interval
+                indexes = np.arange(START+idx,START+idx+INTERV,1)
+                values = eval
+
+                # Compute the mean value and the standard deviation on this interval
+                mean = np.mean(eval)
+                std = np.std(eval)
+
+                # Define the error
+                EPSILON = 0.05*mean
+
+                for j in eval:
+                    if np.abs(j - mean) > EPSILON:
+                        condition_verified = False
+                        break
+                    else:
+                        condition_verified = True
+
+                # Extract mean value
+                if condition_verified == True:
+                    return mean, std, indexes, values
+
+
+    def max_total_force(self,side:str,start:int,end:int,data:np.ndarray):
+            
+        # Select signal
+        if side == "left":
+            ftot = self.data_loadsol_sync["f_total_l"]
+        elif side == "right":
+            ftot = self.data_loadsol_sync["f_total_r"]
+        elif side == "total":
+            ftot = data
+
+        # Define start and end
+        START = start # 500
+        END = end #200
+
+        # Find maximal value 
+        max = np.max(ftot[START:-END])
+
+        # Index of the maximal value 
+        idx_max = np.where(ftot==max)[0][0]
+
+        return max, idx_max
+
+
 
 
 if __name__ == "__main__":
