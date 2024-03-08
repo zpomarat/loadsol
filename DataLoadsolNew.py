@@ -492,16 +492,16 @@ class DataLoadsol:
                     "gyro_x_l": data_gyro_x_l_filled,
                     "gyro_y_l": data_gyro_y_l_filled,
                     "gyro_z_l": data_gyro_z_l_filled,
-                    "f_heel_r": data_f_heel_l_filled,
-                    "f_medial_r": data_f_medial_l_filled,
-                    "f_lateral_r": data_f_lateral_l_filled,
-                    "f_total_r": data_f_total_l_filled,
-                    "acc_x_r": data_acc_x_l_filled,
-                    "acc_y_r": data_acc_y_l_filled,
-                    "acc_z_r": data_acc_z_l_filled,
-                    "gyro_x_r": data_gyro_x_l_filled,
-                    "gyro_y_r": data_gyro_y_l_filled,
-                    "gyro_z_r": data_gyro_z_l_filled
+                    "f_heel_r": data_f_heel_r_filled,
+                    "f_medial_r": data_f_medial_r_filled,
+                    "f_lateral_r": data_f_lateral_r_filled,
+                    "f_total_r": data_f_total_r_filled,
+                    "acc_x_r": data_acc_x_r_filled,
+                    "acc_y_r": data_acc_y_r_filled,
+                    "acc_z_r": data_acc_z_r_filled,
+                    "gyro_x_r": data_gyro_x_r_filled,
+                    "gyro_y_r": data_gyro_y_r_filled,
+                    "gyro_z_r": data_gyro_z_r_filled
                 }
 
     def downsample(self,final_frequency:int):
