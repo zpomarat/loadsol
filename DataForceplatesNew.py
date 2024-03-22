@@ -11,8 +11,8 @@ class DataForceplates:
     def __init__(self, path: str, frequency:int):
         self.path = path
         self.file_name = (self.path.split("\\"))[-1].split(".")[0]
-        self.path_c3d = self.path.split('txt')[0] + 'c3d\\' + self.file_name + ".c3d"
-        self.path_xcp = self.path.split('txt')[0] + 'xcp\\' + self.file_name + ".xcp"
+        self.path_c3d = self.path.split('c3d')[0] + 'c3d'
+        self.path_xcp = self.path.split('c3d')[0] + 'xcp'
         self.file_name = (self.path.split("\\"))[-1].split(".")[0]
         self.frequency = frequency
         self.raw_data = None
@@ -26,9 +26,6 @@ class DataForceplates:
         """
         
         ## Extract timestamp
-        # Path of the xcp file containing the timestamp
-        file_path = self.path[:-3] + "xcp"
-
         # Read the line line containing the timestamp in the text file
         with open(self.path_xcp) as file:
             lines = file.readlines()
@@ -276,7 +273,7 @@ class DataForceplates:
             self.filtered_data["fz5"] = []
 
 
-
+# TEST
 if __name__ == "__main__":
     curr_path = getcwd()
 
