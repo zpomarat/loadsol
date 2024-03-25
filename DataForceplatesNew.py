@@ -10,7 +10,6 @@ from scipy import signal
 class DataForceplates:
     def __init__(self, path: str, frequency:int):
         self.path = path
-        self.file_name = (self.path.split("\\"))[-1].split(".")[0]
         self.path_c3d = self.path.split('c3d')[0] + 'c3d'
         self.path_xcp = self.path.split('c3d')[0] + 'xcp'
         self.file_name = (self.path.split("\\"))[-1].split(".")[0]
